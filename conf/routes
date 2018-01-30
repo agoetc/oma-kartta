@@ -3,5 +3,10 @@
 # ~~~~
 
 # An example controller showing a sample home page
-#GET     /                           controllers.IndexConroller.index
+GET     /                                   controllers.IndexController.index
+GET     /signin                             controllers.IndexController.signin
+GET     /signup                             controllers.IndexController.signup
+GET     /signout                            controllers.IndexController.signout
+GET     /main                               controllers.IndexController.main
+
 # Map static resources from the /public folder to the /assets URL path

@@ -1,58 +1,63 @@
-//package controllers
-//
-//import javax.inject._
-//import play.api.mvc._
-//
-//  class UserController extends UserControllerBase with ScalatraServlet with FormSupport with I18nSupport
-//
-//trait UserControllerBase extends ScalatraServlet with FormSupport with I18nSupport {
-//
-//  case class UserNewForm(id: String, name: String, password: String)
-//
-//  val newForm = mapping(
-//    "id" -> label("id", text(required, maxlength(20))),
-//    "name" -> label("name", text(required, maxlength(20))),
-//    "password" -> label("password", text(required, maxlength(20))),
-//  )(UserNewForm.apply)
-//
-//
-//  def userCreate(form: UserNewForm) {
-//    val db = Database.forConfig("mysqldb")
-//    db.run(Users.map(user => (user.id, user.name, user.password)) += (form.id, form.name, form.password))
-//    redirect("/")
-//  }
-//
-//  post("/register") {
-//    validate(newForm)(
-//      errors => BadRequest(oma.kartta.html.signup()),
-//      form => userCreate(form)
-//    )
-//  }
-//
-//  case class UserAuthentForm(id: String, password: String)
-//
-//  val authentForm = mapping(
-//    "id" -> label("id", text(required, maxlength(20))),
-//    "password" -> label("password", text(required, maxlength(20))),
-//  )(UserAuthentForm.apply)
-//
-//  def userCheck(form: UserAuthentForm) {
-//
-//    val db = Database.forConfig("mysqldb")
-//    val user = db.run(Users.filter(user => user.id === form.id && user.password === form.password).result)
-//
-//    user.onComplete {
-//      case Success(r) => println(r)
-//      case Failure(t) => println(t.getMessage)
-//    }
-//  }
-//
-//  post("/Memlog") {
-//    validate(authentForm)(
-//      errors => BadRequest(oma.kartta.html.signin()), // 入力チェックに引っかかったら
-//      form => userCheck(form) // 入力チェックに成功したら
-//    )
-//
-//  }
-//
-//}
+package controllers
+
+import javax.inject._
+import play.api.mvc._
+import play.api.data._
+import play.api.data.Forms._
+import slick.driver.MySQLDriver.api._
+
+
+class UserController @Inject()(cc: ControllerComponents) extends AbstractController(cc){
+
+  case class UserNewForm(id: String, name: String, password: String)
+
+    val newForm = Form(
+      mapping(
+        "id" -> text,
+        "name" -> text,
+        "password" ->text
+      )(UserNewForm.apply)(UserNewForm.unapply)
+    )
+
+  def userCreate(form: UserNewForm) {
+    val db = Database.forConfig("mysqldb")
+    db.run(Users.map(user => (user.id, user.name, user.password)) += (form.id, form.name, form.password))
+    Redirect(routes.IndexController.index())
+  }
+
+  def register = Action{ implicit request =>
+    newForm.bindFromRequest().fold(
+      errors => Ok(views.html.signup()),
+      form => Ok(userCreate(form))
+    )
+  }
+
+  case class AuthForm(id: String, password: String)
+
+  val authForm = Form(
+    mapping(
+    "id" -> text,
+    "password" -> text
+  )(AuthForm.apply)(AuthForm.unapply))
+
+  def userCheck(form: AuthForm) {
+
+    val db = Database.forConfig("mysqldb")
+    val user = db.run(Users.filter(user => user.id === form.id && user.password === form.password).result)
+
+    user.onComplete {
+      case Success(r) => println(r)
+      case Failure(t) => println(t.getMessage)
+    }
+  }
+
+  def signin = Action{
+    authForm.bindFromRequest().fold(
+      errors => Ok(views.html.signin()),
+      form =>{
+        userCheck(form)
+        Ok(views.html.main())
+      }
+    )
+  }
+}

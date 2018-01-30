@@ -1,0 +1,9 @@
+@import oma.kartta.model.Tables.Restaurants
+@import scala.concurrent.Future
+@import scala.concurrent.ExecutionContext.Implicits.global
+@(restaurants: Seq[Restaurants#TableElementType])
+@oma.kartta.restaurant.layout.html.default("店舗一覧", "店舗一覧") {
+    @oma.kartta.restaurant.html.searchform()
+    @println(restaurants)
+
+}

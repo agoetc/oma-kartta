@@ -1,0 +1,23 @@
+@()(implicit request: javax.servlet.http.HttpServletRequest)
+@import org.scalatra.forms.views._
+
+@oma.kartta.layout.html.default("新規登録ページ", "新規登録ページ"){
+  <form class="form" action="/user/register" method="post">
+      <div class="form-group">
+          <input type="text" name="id" class="form-control" placeholder="ユーザーid">
+          <span class="error text-danger">@error("id")</span>
+      </div>
+
+      <div class="form-group">
+          <input type="text" name="name" class="form-control" placeholder="名前">
+          <span class="error text-danger">@error("name")</span>
+      </div>
+
+      <div class="form-group">
+          <input type="password" name="password" class="form-control" placeholder="パスワード">
+          <span class="error text-danger">@error("password")</span>
+      </div>
+
+      <button type="submit" class="btn btn-primary">送信</button>
+  </form>
+}

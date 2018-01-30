@@ -1,12 +1,14 @@
 # Routes
-# This file defines all application routes (Higher priority routes first)
-# ~~~~
-
-# An example controller showing a sample home page
 GET     /                                   controllers.IndexController.index
 GET     /signin                             controllers.IndexController.signin
+POST    /signin                             controllers.UserController.signin
 GET     /signup                             controllers.IndexController.signup
+POST    /register                           controllers.UserController.register
 GET     /signout                            controllers.IndexController.signout
 GET     /main                               controllers.IndexController.main
 
-# Map static resources from the /public folder to the /assets URL path
+GET     /restaurant                        controllers.RestaurantController.index
+GET     /restaurant/new                    controllers.RestaurantController.add
+POST    /restaurant/new                    controllers.RestaurantController.register
+
+GET     /assets/*file                        controllers.Assets.versioned(path="/public", file: Asset)

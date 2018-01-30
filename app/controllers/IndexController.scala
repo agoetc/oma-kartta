@@ -15,7 +15,7 @@ class IndexController @Inject()(cc: ControllerComponents) extends AbstractContro
   }
 
   def signup = Action{
-    Ok(views.html.signin())
+    Ok(views.html.signup())
   }
 
   def signout = Action{

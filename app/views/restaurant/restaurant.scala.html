@@ -1,3 +1,6 @@
-@()
-@layout.default("店舗：新規登録", "店舗登録フォーム"){
+@(restaurant: models.Tables.Restaurants#TableElementType)
+@layout.default("店舗", restaurant.name){
+    <dev>
+        <p>@restaurant.text</p>
+    </dev>
 }

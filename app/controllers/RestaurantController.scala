@@ -8,18 +8,21 @@ import slick.driver.MySQLDriver.api._
 import models.Tables._
 import scala.concurrent._
 import ExecutionContext.Implicits.global
-import scala.concurrent.duration.Duration
 
 @Singleton
 class RestaurantController @Inject()(cc: ControllerComponents) extends AbstractController(cc){
 
   def index(area: Option[String], keyword: Option[String]) = Action.async{
     val db = Database.forConfig("mysqldb")
-    val restaurants = db.run(Restaurants.filter(restaurant => (restaurant.address like "%" + area.getOrElse("") + "%") ||
+    val restaurants = db.run(Restaurants.filter(restaurant => (restaurant.address like "%" + area.getOrElse("") + "%") &&
       (restaurant.text like "%" + keyword.getOrElse("") + "%")).result)
     restaurants.map(restaurant => Ok(views.html.restaurant.restaurantlist(restaurant)))
-//    Await.ready(restaurants, Duration.Inf)
+  }
 
+  def restaurantDitail(id:Int) = Action.async{
+    val db = Database.forConfig("mysqldb")
+    val restaurant = db.run(Restaurants.filter(restaurant => restaurant.id === id).result)
+    restaurant.map(restaurant => Ok(views.html.restaurant.restaurant(restaurant.head)))
   }
 
   def add = Action{

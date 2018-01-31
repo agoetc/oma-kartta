@@ -12,7 +12,7 @@
         <tbody>
     @for(restaurant <- restaurants.head){
         <tr>
-            <td>@restaurant.name</td>
+            <td><a href="/restaurant/ditail/@restaurant.id">@restaurant.name</a></td>
             <td>@restaurant.address</td>
         </tr>
     }

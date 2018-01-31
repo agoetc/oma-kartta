@@ -58,5 +58,4 @@ class RestaurantController @Inject()(cc: ControllerComponents) extends AbstractC
     db.run(Restaurants.map(restaurant => (restaurant.name, restaurant.kana, restaurant.phone, restaurant.text, restaurant.postalCode, restaurant.address))
       += ((form.name, form.kana, form.phone, form.text, form.postal_code, form.address)))
   }
-
 }

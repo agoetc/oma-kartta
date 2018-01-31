@@ -1,0 +1,24 @@
+@()
+<form action="/restaurant/karttanaAdd" method="post">
+    <div class="row">
+    <div class="form-group">
+        <select class="form-control" id="start" name="star" placeholder="評価[最大5]">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5" selected>5</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <input type="text" class="form-control" id="sana" name="sana" placeholder="一言">
+    </div>
+
+    <div class="form-group" size="10">
+        <div>
+            <button type="submit" class="btn btn-primary">カルタナ</button>
+        </div>
+    </div>
+    </div>
+
+</form>

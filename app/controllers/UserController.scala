@@ -6,6 +6,8 @@ import play.api.data._
 import play.api.data.Forms._
 import slick.driver.MySQLDriver.api._
 import models.Tables._
+import scala.concurrent._
+import ExecutionContext.Implicits.global
 
 
 
@@ -34,5 +36,11 @@ class UserController @Inject()(cc: ControllerComponents) extends AbstractControl
         Redirect("/main")
       }
     )
+  }
+
+  def userDetail(id: String) = Action.async{
+    val db = Database.forConfig("mysqldb")
+    val user = db.run(Users.filter(user => user.id === id).result)
+    user.map(user => Ok(views.html.user.user(user.head)))
   }
 }

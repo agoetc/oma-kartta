@@ -63,4 +63,11 @@ class UserController @Inject()(cc: ControllerComponents) extends AbstractControl
 //    )
     Ok(views.html.main())
   }
+
+  def userDetail(id: String){
+    val db = Database.forConfig("mysqldb")
+    val user = db.run(Users.filter(user => user.id === id).result)
+    user.map(restaurant => Ok(views.html.main()))
+  }
+
 }

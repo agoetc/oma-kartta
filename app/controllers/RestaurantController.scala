@@ -6,17 +6,20 @@ import play.api.data._
 import play.api.data.Forms._
 import slick.driver.MySQLDriver.api._
 import models.Tables._
+import scala.concurrent._
+import ExecutionContext.Implicits.global
+import scala.concurrent.duration.Duration
 
 @Singleton
 class RestaurantController @Inject()(cc: ControllerComponents) extends AbstractController(cc){
 
-  def index = Action {
-//    val db = Database.forConfig("mysqldb")
-//    val area = params.get("ares")
-//    val keyword = params.get("keyword")
-//    val restaurants = db.run(Restaurants.filter(restaurant => (restaurant.address like "%" + area.getOrElse("") + "%") ||
-//      (restaurant.text like "%" + keyword.getOrElse("") + "%")).result)
-    Ok(views.html.restaurant.restaurantlist())
+  def index(area: Option[String], keyword: Option[String]) = Action.async{
+    val db = Database.forConfig("mysqldb")
+    val restaurants = db.run(Restaurants.filter(restaurant => (restaurant.address like "%" + area.getOrElse("") + "%") ||
+      (restaurant.text like "%" + keyword.getOrElse("") + "%")).result)
+    restaurants.map(restaurant => Ok(views.html.restaurant.restaurantlist(restaurant)))
+//    Await.ready(restaurants, Duration.Inf)
+
   }
 
   def add = Action{

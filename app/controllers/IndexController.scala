@@ -48,7 +48,7 @@ class IndexController @Inject()(cc: ControllerComponents) extends AbstractContro
       errors => Ok(views.html.signin()),
       form =>{
         userCheck(form,request)
-        Redirect("/main").withSession(Session(Map("test"->form.id)))
+        Redirect("/main").withSession(Session(Map("user_id" -> form.id)))
       }
     )
   }

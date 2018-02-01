@@ -14,9 +14,47 @@ trait Tables {
   import slick.jdbc.{GetResult => GR}
 
   /** DDL for all tables. Call .create to execute. */
-  lazy val schema: profile.SchemaDescription = Restaurants.schema ++ UserRestaurants.schema ++ UserReviews.schema ++ Users.schema
+  lazy val schema: profile.SchemaDescription = Karttana.schema ++ Restaurants.schema ++ UserReviews.schema ++ Users.schema
   @deprecated("Use .schema instead of .ddl", "3.0")
   def ddl = schema
+
+  /** Entity class storing rows of table Karttana
+   *  @param id Database column id SqlType(INT), AutoInc, PrimaryKey
+   *  @param restaurantId Database column restaurant_id SqlType(INT)
+   *  @param userId Database column user_id SqlType(VARCHAR), Length(255,true)
+   *  @param star Database column star SqlType(INT)
+   *  @param sana Database column sana SqlType(VARCHAR), Length(255,true)
+   *  @param createdAt Database column created_at SqlType(TIMESTAMP)
+   *  @param updatedAt Database column updated_at SqlType(TIMESTAMP) */
+  case class KarttanaRow(id: Int, restaurantId: Int, userId: String, star: Int, sana: String, createdAt: java.sql.Timestamp, updatedAt: java.sql.Timestamp)
+  /** GetResult implicit for fetching KarttanaRow objects using plain SQL queries */
+  implicit def GetResultKarttanaRow(implicit e0: GR[Int], e1: GR[String], e2: GR[java.sql.Timestamp]): GR[KarttanaRow] = GR{
+    prs => import prs._
+    KarttanaRow.tupled((<<[Int], <<[Int], <<[String], <<[Int], <<[String], <<[java.sql.Timestamp], <<[java.sql.Timestamp]))
+  }
+  /** Table description of table karttana. Objects of this class serve as prototypes for rows in queries. */
+  class Karttana(_tableTag: Tag) extends profile.api.Table[KarttanaRow](_tableTag, Some("omakartta"), "karttana") {
+    def * = (id, restaurantId, userId, star, sana, createdAt, updatedAt) <> (KarttanaRow.tupled, KarttanaRow.unapply)
+    /** Maps whole row to an option. Useful for outer joins. */
+    def ? = (Rep.Some(id), Rep.Some(restaurantId), Rep.Some(userId), Rep.Some(star), Rep.Some(sana), Rep.Some(createdAt), Rep.Some(updatedAt)).shaped.<>({r=>import r._; _1.map(_=> KarttanaRow.tupled((_1.get, _2.get, _3.get, _4.get, _5.get, _6.get, _7.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
+
+    /** Database column id SqlType(INT), AutoInc, PrimaryKey */
+    val id: Rep[Int] = column[Int]("id", O.AutoInc, O.PrimaryKey)
+    /** Database column restaurant_id SqlType(INT) */
+    val restaurantId: Rep[Int] = column[Int]("restaurant_id")
+    /** Database column user_id SqlType(VARCHAR), Length(255,true) */
+    val userId: Rep[String] = column[String]("user_id", O.Length(255,varying=true))
+    /** Database column star SqlType(INT) */
+    val star: Rep[Int] = column[Int]("star")
+    /** Database column sana SqlType(VARCHAR), Length(255,true) */
+    val sana: Rep[String] = column[String]("sana", O.Length(255,varying=true))
+    /** Database column created_at SqlType(TIMESTAMP) */
+    val createdAt: Rep[java.sql.Timestamp] = column[java.sql.Timestamp]("created_at")
+    /** Database column updated_at SqlType(TIMESTAMP) */
+    val updatedAt: Rep[java.sql.Timestamp] = column[java.sql.Timestamp]("updated_at")
+  }
+  /** Collection-like TableQuery object for table Karttana */
+  lazy val Karttana = new TableQuery(tag => new Karttana(tag))
 
   /** Entity class storing rows of table Restaurants
    *  @param id Database column id SqlType(INT), AutoInc, PrimaryKey
@@ -55,47 +93,6 @@ trait Tables {
   }
   /** Collection-like TableQuery object for table Restaurants */
   lazy val Restaurants = new TableQuery(tag => new Restaurants(tag))
-
-  /** Entity class storing rows of table UserRestaurants
-   *  @param id Database column id SqlType(INT), AutoInc, PrimaryKey
-   *  @param userId Database column user_id SqlType(VARCHAR), Length(255,true)
-   *  @param star Database column star SqlType(INT), Default(None)
-   *  @param sana Database column sana SqlType(VARCHAR), Length(255,true), Default(None)
-   *  @param latitude Database column latitude SqlType(DECIMAL)
-   *  @param longitude Database column longitude SqlType(DECIMAL)
-   *  @param createdAt Database column created_at SqlType(TIMESTAMP)
-   *  @param updatedAt Database column updated_at SqlType(TIMESTAMP) */
-  case class UserRestaurantsRow(id: Int, userId: String, star: Option[Int] = None, sana: Option[String] = None, latitude: scala.math.BigDecimal, longitude: scala.math.BigDecimal, createdAt: java.sql.Timestamp, updatedAt: java.sql.Timestamp)
-  /** GetResult implicit for fetching UserRestaurantsRow objects using plain SQL queries */
-  implicit def GetResultUserRestaurantsRow(implicit e0: GR[Int], e1: GR[String], e2: GR[Option[Int]], e3: GR[Option[String]], e4: GR[scala.math.BigDecimal], e5: GR[java.sql.Timestamp]): GR[UserRestaurantsRow] = GR{
-    prs => import prs._
-    UserRestaurantsRow.tupled((<<[Int], <<[String], <<?[Int], <<?[String], <<[scala.math.BigDecimal], <<[scala.math.BigDecimal], <<[java.sql.Timestamp], <<[java.sql.Timestamp]))
-  }
-  /** Table description of table user_restaurants. Objects of this class serve as prototypes for rows in queries. */
-  class UserRestaurants(_tableTag: Tag) extends profile.api.Table[UserRestaurantsRow](_tableTag, Some("omakartta"), "user_restaurants") {
-    def * = (id, userId, star, sana, latitude, longitude, createdAt, updatedAt) <> (UserRestaurantsRow.tupled, UserRestaurantsRow.unapply)
-    /** Maps whole row to an option. Useful for outer joins. */
-    def ? = (Rep.Some(id), Rep.Some(userId), star, sana, Rep.Some(latitude), Rep.Some(longitude), Rep.Some(createdAt), Rep.Some(updatedAt)).shaped.<>({r=>import r._; _1.map(_=> UserRestaurantsRow.tupled((_1.get, _2.get, _3, _4, _5.get, _6.get, _7.get, _8.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
-
-    /** Database column id SqlType(INT), AutoInc, PrimaryKey */
-    val id: Rep[Int] = column[Int]("id", O.AutoInc, O.PrimaryKey)
-    /** Database column user_id SqlType(VARCHAR), Length(255,true) */
-    val userId: Rep[String] = column[String]("user_id", O.Length(255,varying=true))
-    /** Database column star SqlType(INT), Default(None) */
-    val star: Rep[Option[Int]] = column[Option[Int]]("star", O.Default(None))
-    /** Database column sana SqlType(VARCHAR), Length(255,true), Default(None) */
-    val sana: Rep[Option[String]] = column[Option[String]]("sana", O.Length(255,varying=true), O.Default(None))
-    /** Database column latitude SqlType(DECIMAL) */
-    val latitude: Rep[scala.math.BigDecimal] = column[scala.math.BigDecimal]("latitude")
-    /** Database column longitude SqlType(DECIMAL) */
-    val longitude: Rep[scala.math.BigDecimal] = column[scala.math.BigDecimal]("longitude")
-    /** Database column created_at SqlType(TIMESTAMP) */
-    val createdAt: Rep[java.sql.Timestamp] = column[java.sql.Timestamp]("created_at")
-    /** Database column updated_at SqlType(TIMESTAMP) */
-    val updatedAt: Rep[java.sql.Timestamp] = column[java.sql.Timestamp]("updated_at")
-  }
-  /** Collection-like TableQuery object for table UserRestaurants */
-  lazy val UserRestaurants = new TableQuery(tag => new UserRestaurants(tag))
 
   /** Entity class storing rows of table UserReviews
    *  @param id Database column id SqlType(INT), AutoInc, PrimaryKey

@@ -1,6 +1,6 @@
 @(restaurants: models.Tables.Restaurants#TableElementType)
 @layout.default("店舗", restaurants.name){
-    @karttanaform()
+    @karttanaform(restaurants.id)
     <dev>
         <p>@restaurants.text</p>
     </dev>

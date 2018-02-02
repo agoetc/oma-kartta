@@ -50,6 +50,6 @@ class UserController @Inject()(cc: ControllerComponents) extends AbstractControl
     val db = Database.forConfig("mysqldb")
     val users = db.run(Users.filter(user => (user.name like "%" + username.getOrElse("") + "%") &&
       (user.id like "%" + userID.getOrElse("") + "%")).result)
-    users.map(user => Ok(views.html.restaurant.restaurantlist(user)))
+    users.map(user => Ok(views.html.restaurant.userlist(user)))
   }
 }

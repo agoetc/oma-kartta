@@ -12,12 +12,13 @@ import ExecutionContext.Implicits.global
 @Singleton
 class RestaurantController @Inject()(cc: ControllerComponents) extends AbstractController(cc){
 
-  def index(area: Option[String], keyword: Option[String]) = Action.async{
-    val db = Database.forConfig("mysqldb")
-    val restaurants = db.run(Restaurants.filter(restaurant => (restaurant.address like "%" + area.getOrElse("") + "%") &&
-      (restaurant.text like "%" + keyword.getOrElse("") + "%")).result)
-    restaurants.map(restaurant => Ok(views.html.restaurant.restaurantlist(restaurant)))
-  }
+//  def index(area: Option[String], keyword: Option[String]) = Action.async{
+//    val db = Database.forConfig("mysqldb")
+//    val restaurants = db.run(Restaurants.filter(restaurant => (restaurant.address like "%" + area.getOrElse("") + "%") &&
+//      (restaurant.text like "%" + keyword.getOrElse("") + "%")).result)
+//    restaurants.map(restaurant => Ok(views.html.restaurant.restaurantlist(restaurant)))
+//
+//  }
 
   def restaurantDetail(id:Int) = Action.async{
     val db = Database.forConfig("mysqldb")

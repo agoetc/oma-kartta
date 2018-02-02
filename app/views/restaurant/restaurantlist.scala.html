@@ -1,19 +1,19 @@
-@(restaurants: Seq[models.Tables.Restaurants#TableElementType]*)
-@layout.default("店舗一覧", "店舗一覧") {
+@(users: Seq[models.Tables.Users#TableElementType]*)
+@layout.default("ユーザー一覧", "ユーザー一覧") {
     @searchform()
 
     <table class="table">
         <thead class="thead-light">
             <tr>
-                <th>お店の名前</th>
-                <th>住所</th>
+                <th>ユーザーの名前</th>
+                <th>ID</th>
             </tr>
         </thead>
         <tbody>
-    @for(restaurant <- restaurants.head){
+    @for(user <- users.head){
         <tr>
-            <td><a href="/restaurant/detail/@restaurant.id">@restaurant.name</a></td>
-            <td>@restaurant.address</td>
+            <td><a href="/user/detail/@user.id">@user.name</a></td>
+            <td>@user.id</td>
         </tr>
     }
         </tbody>

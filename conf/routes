@@ -9,10 +9,10 @@ GET     /main                               controllers.IndexController.main
 
 GET	    /user/ditail/:id		            controllers.UserController.userDetail(id: String)
 
-GET     /user                               controllers.UserController.index(username: Option[String],userID: Option[String])
-GET     /restaurant/new                     controllers.RestaurantController.add
-POST    /restaurant/new                     controllers.RestaurantController.register
-GET     /restaurant/detail/:id              controllers.RestaurantController.restaurantDetail(id:Int)
-POST    /restaurant/detail/:id/karttanaAdd  controllers.RestaurantController.karttanaAdd(id: Int)
+GET     /restaurant                        controllers.RestaurantController.index(area: Option[String],keyword: Option[String])
+GET     /restaurant/new                    controllers.RestaurantController.add
+POST    /restaurant/new                    controllers.RestaurantController.register
+GET     /restaurant/detail/:id             controllers.RestaurantController.restaurantDetail(id:Int)
+POST    /restaurant/detail/:id/karttanaAdd controllers.RestaurantController.karttanaAdd(id: Int)
 
-GET     /assets/*file                       controllers.Assets.versioned(path="/public", file: Asset)
+GET     /assets/*file                        controllers.Assets.versioned(path="/public", file: Asset)

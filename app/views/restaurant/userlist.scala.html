@@ -1,0 +1,21 @@
+@(users: Seq[models.Tables.Users#TableElementType]*)
+@layout.default("ユーザー一覧", "ユーザー一覧") {
+    @searchform()
+
+    <table class="table">
+        <thead class="thead-light">
+            <tr>
+                <th>ユーザーの名前</th>
+                <th>ID</th>
+            </tr>
+        </thead>
+        <tbody>
+    @for(user <- users.head){
+        <tr>
+            <td><a href="/user/detail/@user.id">@user.name</a></td>
+            <td>@user.id</td>
+        </tr>
+    }
+        </tbody>
+    </table>
+}

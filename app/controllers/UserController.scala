@@ -44,7 +44,7 @@ class UserController @Inject()(cc: ControllerComponents) extends AbstractControl
     val authid=request.session.get("user_id").getOrElse("")
     user.map(user =>
       authid match{
-        case authid if authid==user.head.id => Ok(views.html.user. mypage(user.head))
+        case authid if authid==user.head.id => Ok(views.html.user.mypage(user.head))
         case _ => Ok(views.html.user.user(user.head))
 
       })

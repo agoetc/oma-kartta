@@ -78,8 +78,8 @@ class RestaurantController @Inject()(cc: ControllerComponents) extends AbstractC
 
   def restaurantCreate(form: RestaurantNewForm) {
     val db = Database.forConfig("mysqldb")
-//    db.run(Restaurants.map(restaurant => (restaurant.name, restaurant.kana, restaurant.text, restaurant.postalCode, restaurant.address))
-//      += ((form.name, form.kana, form.text, form.postal_code, form.address)))
+//    db.run(Restaurants.map(restaurant => (restaurant.name, restaurant.kana, restaurant.phone, restaurant.text, restaurant.postalCode, restaurant.address))
+//      += ((form.name, form.kana, form.phone, form.text, form.postal_code, form.address)))
   }
 
 

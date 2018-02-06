@@ -7,6 +7,10 @@ import play.api.data.Forms._
 import slick.driver.MySQLDriver.api._
 import models.Tables._
 import scala.concurrent._
+import scala.concurrent._
+import scala.concurrent.duration._
+import scala.language.postfixOps
+import scala.util.{Failure, Success}
 import ExecutionContext.Implicits.global
 
 
@@ -42,12 +46,14 @@ class UserController @Inject()(cc: ControllerComponents) extends AbstractControl
     val db = Database.forConfig("mysqldb")
     val user = db.run(Users.filter(user => user.id === id).result)
     val authid=request.session.get("user_id").getOrElse("")
-    user.map(user =>
-      authid match{
-        case authid if authid==user.head.id => Ok(views.html.user.mypage(user.head))
-        case _ => Ok(views.html.user.user(user.head))
+    val follow = db.run(Relation.filter(relation => relation.followId === authid).result)
+      user.map(user =>
+        authid match {
+          case authid if authid == user.head.id => Ok(views.html.user.mypage(user.head, follow.toString.head, 2))
+          case _ => Ok(views.html.user.user(user.head))
+        }
+      )
 
-      })
   }
 
 

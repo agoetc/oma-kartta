@@ -1,6 +1,17 @@
-@(user: models.Tables.Users#TableElementType)
+@(user: models.Tables.Users#TableElementType,follownum: Int,followernum: Int)
 @layout.default("マイページページ", user.id){
     <dev>
         <p>@user.name のマイページ</p>
+        <thead class="thead-light">
+            <tr>
+                <th>フォロー数</th>
+                <th>@follownum</th>
+            </tr>
+            <br>
+        </thead>
+        <tr>
+            <th>フォロワー数</th>
+            <th>@followernum</th>
+        </tr>
     </dev>
 }

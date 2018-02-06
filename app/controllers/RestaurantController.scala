@@ -83,8 +83,6 @@ class RestaurantController @Inject()(cc: ControllerComponents) extends AbstractC
         // insertしたrestaurantのid取得
         val futureId :Future[Int] = restaurantCreate(form, request)
         // futureで値を取得できたらリダイレクト
-//        var restaurantId = 0
-//        id.onComplete { case Success(id) =>  restaurantId = id}
         Await.ready(futureId, 20 second)
 
         if(futureId.isCompleted){

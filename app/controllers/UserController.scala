@@ -47,12 +47,19 @@ class UserController @Inject()(cc: ControllerComponents) extends AbstractControl
     val user = db.run(Users.filter(user => user.id === id).result)
     val authid=request.session.get("user_id").getOrElse("")
     val follow = db.run(Relation.filter(relation => relation.followId === authid).result)
-      user.map(user =>
-        authid match {
-          case authid if authid == user.head.id => Ok(views.html.user.mypage(user.head, follow.toString.head, 2))
-          case _ => Ok(views.html.user.user(user.head))
-        }
-      )
+    val follower = db.run(Relation.filter(relation => relation.followId === authid).result)
+    Await.ready(follow, 20 second)
+    Await.ready(follower, 20 second)
+    val followLen = follow.value.get.get.length
+    val followerLen = follower.value.get.get.length
+
+    println(followLen,followerLen)
+    user.map(user =>
+      authid match {
+        case authid if authid == user.head.id => Ok(views.html.user.mypage(user.head, followLen, followerLen))
+        case _ => Ok(views.html.user.user(user.head))
+      }
+    )
 
   }
 

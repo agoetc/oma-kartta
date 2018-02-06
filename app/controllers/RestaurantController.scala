@@ -33,6 +33,9 @@ class RestaurantController @Inject()(cc: ControllerComponents) extends AbstractC
     restaurant.map(restaurant => Ok(views.html.restaurant.restaurant(restaurant.head)))
   }
 
+  def addMap() = Action{
+    Ok(views.html.restaurant.restaurantadd())
+  }
 
   case class MapContent(content: String)
 
@@ -58,7 +61,7 @@ class RestaurantController @Inject()(cc: ControllerComponents) extends AbstractC
     val posbool = request.session.get("postal_code").isEmpty
     val addressbool = request.session.get("address").isEmpty
     (posbool,addressbool) match {
-      case (false,false) => Ok(views.html.restaurant.restaurantadd())
+      case (false,false) => Ok(views.html.restaurant.restaurantaddform())
       case _ => Redirect("/main")
     }
   }
@@ -67,8 +70,8 @@ class RestaurantController @Inject()(cc: ControllerComponents) extends AbstractC
 
   val newForm = Form(
     mapping(
-      "name" -> text,
-      "kana" -> text,
+      "name" -> nonEmptyText,
+      "kana" -> nonEmptyText,
       "text" -> optional(text),
     )(RestaurantNewForm.apply)(RestaurantNewForm.unapply)
   )
@@ -100,14 +103,12 @@ class RestaurantController @Inject()(cc: ControllerComponents) extends AbstractC
 
   def restaurantCreate(form: RestaurantNewForm, request: Request[AnyContent]) :Future[Int] ={
     val db = Database.forConfig("mysqldb")
-
     val id: Future[Int] = (request.session.get("postal_code"), request.session.get("address")) match{
         // セッションにpostal_codeとaddressが存在するとき
       case (Some(postal_code),Some(address)) =>
         val action = Restaurants returning Restaurants.map(_.id) +=
           RestaurantsRow(0,form.name, form.kana, form.text, postal_code, address)
         db.run(action)
-
           //　セッションがないときの処理
 //      case (_,_) =>
     }

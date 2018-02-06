@@ -10,6 +10,7 @@ GET     /main                               controllers.IndexController.main
 GET	    /user/detail/:id		            controllers.UserController.userDetail(id: String)
 
 GET     /user                               controllers.UserController.index(username: Option[String],userID: Option[String])
+GET     /restaurant/add                     controllers.RestaurantController.addMap
 GET     /restaurant/new                     controllers.RestaurantController.restaurantAdd
 POST    /restaurant/new                     controllers.RestaurantController.contentPost
 POST    /restaurant/register                controllers.RestaurantController.register

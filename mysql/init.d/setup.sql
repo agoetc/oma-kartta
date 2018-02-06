@@ -31,3 +31,8 @@ CREATE TABLE restaurants (
   postal_code INTEGER(8) NOT NULL,
   address VARCHAR(255) NOT NULL
 );
+
+CREATE TABLE follow (
+  following_id INT AUTO_INCREMENT NOT NULL PRIMARY KEY,
+  follower_id INT
+);

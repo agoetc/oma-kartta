@@ -38,10 +38,16 @@ class UserController @Inject()(cc: ControllerComponents) extends AbstractControl
     )
   }
 
-  def userDetail(id: String) = Action.async{
+  def userDetail(id: String) = Action.async{ implicit request =>
     val db = Database.forConfig("mysqldb")
     val user = db.run(Users.filter(user => user.id === id).result)
-    user.map(user => Ok(views.html.user.user(user.head)))
+    val authid=request.session.get("user_id").getOrElse("")
+    user.map(user =>
+      authid match{
+        case authid if authid==user.head.id => Ok(views.html.user. mypage(user.head))
+        case _ => Ok(views.html.user.user(user.head))
+
+      })
   }
 
 

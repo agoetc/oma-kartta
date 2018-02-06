@@ -26,13 +26,13 @@ CREATE TABLE restaurants (
   id INT AUTO_INCREMENT NOT NULL PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
   kana VARCHAR(255) NOT NULL,
-  phone INTEGER(12) NOT NULL,
   text VARCHAR(255),
-  postal_code INTEGER(8) NOT NULL,
+  postal_code VARCHAR(8) NOT NULL,
   address VARCHAR(255) NOT NULL
 );
 
-CREATE TABLE follow (
-  following_id INT AUTO_INCREMENT NOT NULL PRIMARY KEY,
-  follower_id INT
+CREATE TABLE relation (
+  id INT AUTO_INCREMENT NOT NULL PRIMARY KEY,
+  follow_id VARCHAR(255) NOT NULL,
+  follower_id VARCHAR(255) NOT NULL
 );

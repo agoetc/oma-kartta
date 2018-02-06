@@ -14,7 +14,7 @@ trait Tables {
   import slick.jdbc.{GetResult => GR}
 
   /** DDL for all tables. Call .create to execute. */
-  lazy val schema: profile.SchemaDescription = Karttana.schema ++ Restaurants.schema ++ UserReviews.schema ++ Users.schema
+  lazy val schema: profile.SchemaDescription = Karttana.schema ++ Relation.schema ++ Restaurants.schema ++ UserReviews.schema ++ Users.schema
   @deprecated("Use .schema instead of .ddl", "3.0")
   def ddl = schema
 
@@ -56,25 +56,50 @@ trait Tables {
   /** Collection-like TableQuery object for table Karttana */
   lazy val Karttana = new TableQuery(tag => new Karttana(tag))
 
+  /** Entity class storing rows of table Relation
+   *  @param id Database column id SqlType(INT), AutoInc, PrimaryKey
+   *  @param followId Database column follow_id SqlType(VARCHAR), Length(255,true)
+   *  @param followerId Database column follower_id SqlType(VARCHAR), Length(255,true) */
+  case class RelationRow(id: Int, followId: String, followerId: String)
+  /** GetResult implicit for fetching RelationRow objects using plain SQL queries */
+  implicit def GetResultRelationRow(implicit e0: GR[Int], e1: GR[String]): GR[RelationRow] = GR{
+    prs => import prs._
+    RelationRow.tupled((<<[Int], <<[String], <<[String]))
+  }
+  /** Table description of table relation. Objects of this class serve as prototypes for rows in queries. */
+  class Relation(_tableTag: Tag) extends profile.api.Table[RelationRow](_tableTag, Some("omakartta"), "relation") {
+    def * = (id, followId, followerId) <> (RelationRow.tupled, RelationRow.unapply)
+    /** Maps whole row to an option. Useful for outer joins. */
+    def ? = (Rep.Some(id), Rep.Some(followId), Rep.Some(followerId)).shaped.<>({r=>import r._; _1.map(_=> RelationRow.tupled((_1.get, _2.get, _3.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
+
+    /** Database column id SqlType(INT), AutoInc, PrimaryKey */
+    val id: Rep[Int] = column[Int]("id", O.AutoInc, O.PrimaryKey)
+    /** Database column follow_id SqlType(VARCHAR), Length(255,true) */
+    val followId: Rep[String] = column[String]("follow_id", O.Length(255,varying=true))
+    /** Database column follower_id SqlType(VARCHAR), Length(255,true) */
+    val followerId: Rep[String] = column[String]("follower_id", O.Length(255,varying=true))
+  }
+  /** Collection-like TableQuery object for table Relation */
+  lazy val Relation = new TableQuery(tag => new Relation(tag))
+
   /** Entity class storing rows of table Restaurants
    *  @param id Database column id SqlType(INT), AutoInc, PrimaryKey
    *  @param name Database column name SqlType(VARCHAR), Length(255,true)
    *  @param kana Database column kana SqlType(VARCHAR), Length(255,true)
-   *  @param phone Database column phone SqlType(INT)
    *  @param text Database column text SqlType(VARCHAR), Length(255,true), Default(None)
-   *  @param postalCode Database column postal_code SqlType(INT)
+   *  @param postalCode Database column postal_code SqlType(VARCHAR), Length(8,true)
    *  @param address Database column address SqlType(VARCHAR), Length(255,true) */
-  case class RestaurantsRow(id: Int, name: String, kana: String, phone: Int, text: Option[String] = None, postalCode: Int, address: String)
+  case class RestaurantsRow(id: Int, name: String, kana: String, text: Option[String] = None, postalCode: String, address: String)
   /** GetResult implicit for fetching RestaurantsRow objects using plain SQL queries */
   implicit def GetResultRestaurantsRow(implicit e0: GR[Int], e1: GR[String], e2: GR[Option[String]]): GR[RestaurantsRow] = GR{
     prs => import prs._
-    RestaurantsRow.tupled((<<[Int], <<[String], <<[String], <<[Int], <<?[String], <<[Int], <<[String]))
+    RestaurantsRow.tupled((<<[Int], <<[String], <<[String], <<?[String], <<[String], <<[String]))
   }
   /** Table description of table restaurants. Objects of this class serve as prototypes for rows in queries. */
   class Restaurants(_tableTag: Tag) extends profile.api.Table[RestaurantsRow](_tableTag, Some("omakartta"), "restaurants") {
-    def * = (id, name, kana, phone, text, postalCode, address) <> (RestaurantsRow.tupled, RestaurantsRow.unapply)
+    def * = (id, name, kana, text, postalCode, address) <> (RestaurantsRow.tupled, RestaurantsRow.unapply)
     /** Maps whole row to an option. Useful for outer joins. */
-    def ? = (Rep.Some(id), Rep.Some(name), Rep.Some(kana), Rep.Some(phone), text, Rep.Some(postalCode), Rep.Some(address)).shaped.<>({r=>import r._; _1.map(_=> RestaurantsRow.tupled((_1.get, _2.get, _3.get, _4.get, _5, _6.get, _7.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
+    def ? = (Rep.Some(id), Rep.Some(name), Rep.Some(kana), text, Rep.Some(postalCode), Rep.Some(address)).shaped.<>({r=>import r._; _1.map(_=> RestaurantsRow.tupled((_1.get, _2.get, _3.get, _4, _5.get, _6.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
 
     /** Database column id SqlType(INT), AutoInc, PrimaryKey */
     val id: Rep[Int] = column[Int]("id", O.AutoInc, O.PrimaryKey)
@@ -82,12 +107,10 @@ trait Tables {
     val name: Rep[String] = column[String]("name", O.Length(255,varying=true))
     /** Database column kana SqlType(VARCHAR), Length(255,true) */
     val kana: Rep[String] = column[String]("kana", O.Length(255,varying=true))
-    /** Database column phone SqlType(INT) */
-    val phone: Rep[Int] = column[Int]("phone")
     /** Database column text SqlType(VARCHAR), Length(255,true), Default(None) */
     val text: Rep[Option[String]] = column[Option[String]]("text", O.Length(255,varying=true), O.Default(None))
-    /** Database column postal_code SqlType(INT) */
-    val postalCode: Rep[Int] = column[Int]("postal_code")
+    /** Database column postal_code SqlType(VARCHAR), Length(8,true) */
+    val postalCode: Rep[String] = column[String]("postal_code", O.Length(8,varying=true))
     /** Database column address SqlType(VARCHAR), Length(255,true) */
     val address: Rep[String] = column[String]("address", O.Length(255,varying=true))
   }

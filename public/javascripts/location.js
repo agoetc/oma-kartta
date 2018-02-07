@@ -37,7 +37,7 @@ function initMap(){
                 geocoder.geocode( {latLng: pushpos}, function(results, status){
                 results = results[0].formatted_address;
                 var dom = '<form action="/restaurant/new" method="post">' +
-                    '<button type="submit" name="content" value="'+results+'">ボタンの内容</button>' +
+                    '<button type="submit" name="content" value="'+results+'">ここを登録する</button>' +
                     '</form>';
                 infoWindow.setOptions({content: dom});
                 infoWindow.open(map, marker); // 吹き出しの表示

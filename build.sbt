@@ -1,4 +1,5 @@
 name := """play-scala-starter-example"""
+herokuAppName in Compile := "serene-temple-90721"
 
 version := "1.0-SNAPSHOT"
 

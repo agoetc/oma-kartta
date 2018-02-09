@@ -1,4 +1,7 @@
 @()
-@layout.default("店舗：新規登録", "店舗登録フォーム"){
-    @addform()
+@layout.default("レストラン: 追加", "レストラン追加"){
+    <script src="@routes.Assets.versioned("javascripts/location.js")" type="text/javascript"></script>
+    <div id="map"></div>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCAOzLlAZWOmIYS_fDNMEWex6WGUk1sKdw&callback=initMap"></script>
+
 }

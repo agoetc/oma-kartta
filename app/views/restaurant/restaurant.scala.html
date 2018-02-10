@@ -1,4 +1,5 @@
-@(restaurants: models.Tables.Restaurants#TableElementType)
+@(restaurants: models.Tables.Restaurants#TableElementType)(implicit flash: Flash)
+@println(flash)
 @layout.default("店舗", restaurants.name){
     @karttanaform(restaurants.id)
     <dev>

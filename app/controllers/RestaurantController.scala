@@ -27,10 +27,10 @@ class RestaurantController @Inject()(cc: ControllerComponents) extends AbstractC
 //
 //  }
 
-  def restaurantDetail(id:Int) = Action.async{
+  def restaurantDetail(id:Int) = Action.async{ implicit request =>
     val db = Database.forConfig("mysqldb")
     val restaurant = db.run(Restaurants.filter(restaurant => restaurant.id === id).result)
-    restaurant.map(restaurant => Ok(views.html.restaurant.restaurant(restaurant.head)))
+    restaurant.map(restaurant => Ok(views.html.restaurant.restaurant(restaurant.head)).flashing("test"->"ははは"))
   }
 
   def addMap() = Action{
@@ -78,7 +78,7 @@ class RestaurantController @Inject()(cc: ControllerComponents) extends AbstractC
 
   def register = Action{implicit request =>
     newForm.bindFromRequest.fold(
-      errors => Ok(views.html.restaurant.restaurantadd()),
+      errors => Ok(views.html.restaurant.restaurantaddform()),
       form => {
         // insertしたrestaurantのid取得
         val futureId :Future[Int] = restaurantCreate(form, request)
@@ -90,9 +90,7 @@ class RestaurantController @Inject()(cc: ControllerComponents) extends AbstractC
           Redirect(s"/restaurant/detail/${id}").withSession(request.session - "postal_code").withSession(request.session -"address")
         }else{
           Redirect("/main")
-
         }
-
       }
     )
   }
@@ -114,20 +112,6 @@ class RestaurantController @Inject()(cc: ControllerComponents) extends AbstractC
     return id
   }
 
-
-
-//  def karttanaAdd(id: Int) = Action{implicit request =>
-//
-//    karttanaCreateForm.bindFromRequest.fold(
-//      errors =>
-//        Ok(views.html.restaurant.restaurantadd()),
-//      form => {
-//        karttanaCreate(form,id,request)
-//        Redirect("/restaurant")
-//      }
-//    )
-//  }
-
   case class KarttanaCreate(star:Int, sana: String)
   val karttanaCreateForm = Form(
     mapping(
@@ -141,5 +125,17 @@ class RestaurantController @Inject()(cc: ControllerComponents) extends AbstractC
     val db = Database.forConfig("mysqldb")
     db.run(Karttana.map(karttana=> (karttana.userId, karttana.restaurantId, karttana.star, karttana.sana))
       += ((user_id, restaurant_id, form.star, form.sana)))
+  }
+
+  def karttanaAdd(id: Int) = Action{implicit request =>
+
+    karttanaCreateForm.bindFromRequest.fold(
+      errors =>
+        Ok(views.html.restaurant.restaurantaddform()),
+      form => {
+        karttanaCreate(form,id,request)
+        Redirect(s"/restaurant/detail/${id}")
+      }
+    )
   }
 }

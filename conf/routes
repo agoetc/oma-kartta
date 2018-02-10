@@ -15,6 +15,6 @@ GET     /restaurant/new                     controllers.RestaurantController.res
 POST    /restaurant/new                     controllers.RestaurantController.contentPost
 POST    /restaurant/register                controllers.RestaurantController.register
 GET     /restaurant/detail/:id              controllers.RestaurantController.restaurantDetail(id:Int)
-#POST    /restaurant/detail/:id/karttanaAdd  controllers.RestaurantController.karttanaAdd(id: Int)
+POST    /restaurant/detail/:id/karttanaAdd  controllers.RestaurantController.karttanaAdd(id: Int)
 
 GET     /assets/*file                       controllers.Assets.versioned(path="/public", file: Asset)

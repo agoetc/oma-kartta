@@ -13,7 +13,7 @@ function initMap(){
             var geocoder = new google.maps.Geocoder();
 
             map.setCenter({lat: position.coords.latitude,
-                           lng: position.coords.longitude
+                lng: position.coords.longitude
             });
 
             var marker = new google.maps.Marker({ // マーカーの追加
@@ -27,19 +27,20 @@ function initMap(){
                 marker.setPosition(location);
                 infoWindow.close();
             });
-             var infoWindow = new google.maps.InfoWindow({ // 吹き出しの追加
+            var infoWindow = new google.maps.InfoWindow({ // 吹き出しの追加
                 content: '' // 吹き出しに表示する内容
             });
 
             marker.addListener('click', function() { // マーカーをクリックしたとき
                 pushpos = marker.position;
                 geocoder.geocode( {latLng: pushpos}, function(results, status){
-                results = results[0].formatted_address;
-                var dom = '<form action="/restaurant/new" method="post">' +
-                    '<button type="submit" name="content" value="'+results+'">ここを登録する</button>' +
-                    '</form>';
-                infoWindow.setOptions({content: dom});
-                infoWindow.open(map, marker); // 吹き出しの表示
+                    results = results[0].formatted_address;
+                    var dom =
+                        '<form action="/restaurant/new" method="post">' +
+                        '<button type="submit" name="content" value="'+results+'">ここを登録する</button>' +
+                        '</form>';
+                    infoWindow.setOptions({content: dom});
+                    infoWindow.open(map, marker); // 吹き出しの表示
                 });
             });
 

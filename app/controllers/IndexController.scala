@@ -1,12 +1,15 @@
 package controllers
 
 import javax.inject._
+
 import play.api.mvc._
 import play.api.data._
 import play.api.data.Forms._
 import slick.driver.MySQLDriver.api._
 import models.Tables._
-import scala.util.{ Success, Failure }
+import play.api.libs.json._
+
+import scala.util.{Failure, Success}
 import scala.concurrent._
 import ExecutionContext.Implicits.global
 import scala.concurrent.duration._
@@ -60,6 +63,17 @@ class IndexController @Inject()(cc: ControllerComponents) extends AbstractContro
   }
 
   def main =  Action{ implicit request =>
+    val db = Database.forConfig("mysqldb")
+    val user_id = request.session.get("user_id")
+    // フォローしているユーザーのカルタナを検索するクエリ
+    val query = for {
+      relation <- Relation if relation.followId === user_id
+      karttana <- Karttana if karttana.userId === relation.followerId
+    } yield (karttana)
+    val results = db.run(query.result)
+    Await.result(results, 20 seconds)
+
+    
     Ok(views.html.main())
   }
 }

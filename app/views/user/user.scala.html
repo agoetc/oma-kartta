@@ -1,7 +1,9 @@
 @(user: models.Tables.Users#TableElementType)
+
 @layout.default("ユーザーページ", user.id){
     <dev>
         <p>@user.name のユーザーページ</p>
-        <input type="button" value="フォローする" onclick="history.back()">
+        @*<input type="button" value="フォローする" herf="/follw/@user.id">*@
+        <a href="/follw/@user.id">フォローする</a>
     </dev>
 }

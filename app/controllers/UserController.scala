@@ -52,7 +52,6 @@ class UserController @Inject()(cc: ControllerComponents) extends AbstractControl
     Await.ready(follower, 20 second)
     val followLen = follow.value.get.get.length
     val followerLen = follower.value.get.get.length
-    println(followLen, followerLen)
     user.map(user =>
       authid match {
         case authid if authid == user.head.id => Ok(views.html.user.mypage(user.head, followLen, followerLen))
@@ -73,8 +72,16 @@ class UserController @Inject()(cc: ControllerComponents) extends AbstractControl
   def followProcessing(id: String) = Action { implicit request =>
     val db = Database.forConfig("mysqldb")
     val followproID = request.session.get("user_id").getOrElse("")
-    db.run(Relation.map(rel => (rel.followId, rel.followerId)) += (followproID, id))
-    Redirect(s"/user/detail/${id}")
+    val followAuthent = db.run(Relation.filter(relation => relation.followId === followproID && relation.followerId===id).result)
+    Await.ready(followAuthent, 20 second)
+    val followExistence =followAuthent.value.get.get.isEmpty
+    followExistence match{
+      case false =>
+        Redirect(s"/user/detail/${id}")
+      case true =>
+        db.run(Relation.map(rel => (rel.followId, rel.followerId)) += (followproID, id))
+        Redirect(s"/user/detail/${id}")
+    }
   }
 
 

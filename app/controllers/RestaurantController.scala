@@ -112,6 +112,17 @@ class RestaurantController @Inject()(cc: ControllerComponents) extends AbstractC
     return id
   }
 
+  def karttanaAdd(id: Int) = Action{implicit request =>
+    karttanaCreateForm.bindFromRequest.fold(
+      errors =>
+        Ok(views.html.restaurant.restaurantadd()),
+      form => {
+        karttanaCreate(form,id,request)
+        Redirect(s"/restaurant/detail/${id}")
+      }
+    )
+  }
+
   case class KarttanaCreate(star:Int, sana: String)
   val karttanaCreateForm = Form(
     mapping(
@@ -121,21 +132,9 @@ class RestaurantController @Inject()(cc: ControllerComponents) extends AbstractC
   )
 
   def karttanaCreate(form: KarttanaCreate,restaurant_id: Int,request:Request[AnyContent]){
-    val user_id = request.session.get("user_id")getOrElse(Redirect("/signin")).toString()
+    val user_id = request.session.get("user_id").getOrElse("")
     val db = Database.forConfig("mysqldb")
     db.run(Karttana.map(karttana=> (karttana.userId, karttana.restaurantId, karttana.star, karttana.sana))
       += ((user_id, restaurant_id, form.star, form.sana)))
-  }
-
-  def karttanaAdd(id: Int) = Action{implicit request =>
-
-    karttanaCreateForm.bindFromRequest.fold(
-      errors =>
-        Ok(views.html.restaurant.restaurantaddform()),
-      form => {
-        karttanaCreate(form,id,request)
-        Redirect(s"/restaurant/detail/${id}")
-      }
-    )
   }
 }

@@ -64,28 +64,19 @@ class IndexController @Inject()(cc: ControllerComponents) extends AbstractContro
   case class FollowKarttana(userId: String, star: Int, sana: String, restaurantId: Int, createdAt: Date, lat: Double, lng: Double)
 
   def main =  Action{ implicit request =>
-    val db = Database.forConfig("mysqldb")
-    val user_id = request.session.get("user_id")
-    // フォローしているユーザーのカルタナを検索するクエリ
-    val query = for {
-      relation <- Relation if relation.followId === user_id
-      karttana <- Karttana if karttana.userId === relation.followerId
-      restaurant <- Restaurants if restaurant.id === karttana.restaurantId
-    } yield (karttana.userId,karttana.star,karttana.sana,karttana.restaurantId,karttana.createdAt,restaurant.address)
-    val results = db.run(query.result)
-    Await.result(results, 20 seconds)
+    val user_id = request.session.get("user_id").getOrElse("")
+    // フォローしているユーザーのカルタナを取得
+    val results = KarttanaDao.getFollowKarttana(user_id)
 
     // レストランの住所をgeocodingしてcase classに入れる
     val geo = Geocoder.create(ConfigFactory.load().getString("apiKey"))
-    val followKarttana:Seq[FollowKarttana] = for(karttana <- results.value.get.get) yield {
+    val followKarttana:Seq[FollowKarttana] = for(karttana <- results) yield {
       val location = geo.lookup(karttana._6).head.geometry.location
       FollowKarttana(karttana._1, karttana._2, karttana._3, karttana._4, karttana._5, location.latitude, location.longitude)
     }
 
     implicit val followKarttanaFormat = Json.format[FollowKarttana]
     val resultJson = Json.toJson(followKarttana)
-
-    println(resultJson)
 
     Ok(views.html.main())
   }

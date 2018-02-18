@@ -1,7 +1,7 @@
 package models
 
 import slick.jdbc.MySQLProfile.api._
-import models.Tables.Users
+import models.Tables._
 import scala.util.{Failure, Success}
 import scala.concurrent._
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -27,6 +27,6 @@ trait UserDao {
     val result = db.run(query)
     try Await.result(result,5 seconds).nonEmpty
     catch { case e: TimeoutException => false }
-
   }
+
 }

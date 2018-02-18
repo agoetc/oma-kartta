@@ -21,7 +21,7 @@ import scala.language.postfixOps
 
 
 @Singleton
-class IndexController @Inject()(cc: ControllerComponents) extends AbstractController(cc) with UserDao{
+class IndexController @Inject()(cc: ControllerComponents) extends AbstractController(cc){
 
   def index = Action{
     Ok(views.html.index())
@@ -48,7 +48,7 @@ class IndexController @Inject()(cc: ControllerComponents) extends AbstractContro
     authForm.bindFromRequest().fold(
       errors => Ok(views.html.signin()),
       form =>{
-        auth(form.id,form.password) match{
+        UserDao.auth(form.id,form.password) match{
           case true => Redirect("/main").withSession ("user_id" -> form.id)
           case false => Redirect("/signin")
         }

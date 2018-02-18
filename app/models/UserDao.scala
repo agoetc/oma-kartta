@@ -11,7 +11,7 @@ import scala.concurrent.duration._
 
 
 
-trait UserDao {
+object UserDao {
 
   lazy val db = Database.forConfig("mysqldb")
 

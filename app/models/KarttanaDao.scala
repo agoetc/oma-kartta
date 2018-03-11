@@ -32,7 +32,6 @@ object KarttanaDao {
       restaurant <- Restaurants if restaurant.id === karttana.restaurantId
     } yield (karttana.userId, karttana.star, karttana.sana, karttana.restaurantId, karttana.createdAt, restaurant.address)
     val results = db.run(query.result)
-
-    Await.result(results, 20 seconds)
+    results
   }
 }

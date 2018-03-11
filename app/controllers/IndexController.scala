@@ -7,7 +7,6 @@ import play.api.data._
 import play.api.data.Forms._
 import slick.driver.MySQLDriver.api._
 import models.Tables._
-import play.api.libs.json.{JsValue, Json}
 import play.api.libs.json.Writes._
 import java.util.Date
 
@@ -18,6 +17,10 @@ import models._
 import scala.concurrent._
 import scala.concurrent.duration._
 import scala.language.postfixOps
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.util.{Failure, Success}
+import play.api.libs.json._
+import play.api.libs.functional.syntax._
 
 
 @Singleton
@@ -63,23 +66,22 @@ class IndexController @Inject()(cc: ControllerComponents) extends AbstractContro
 
   case class FollowKarttana(userId: String, star: Int, sana: String, restaurantId: Int, createdAt: Date, lat: Double, lng: Double)
 
-  def main =  Action{ implicit request =>
+  def main =  Action.async { implicit request =>
     val user_id = request.session.get("user_id").getOrElse("")
     // フォローしているユーザーのカルタナを取得
     val results = KarttanaDao.getFollowKarttana(user_id)
+    results.map { karttana =>
+      val geo = Geocoder.create(ConfigFactory.load().getString("apiKey"))
+      val followKarttana : Seq[FollowKarttana] = for(karttana <- karttana) yield {
+        val location = geo.lookup(karttana._6).head.geometry.location
+        FollowKarttana(karttana._1, karttana._2, karttana._3, karttana._4, karttana._5, location.latitude, location.longitude)
+      }
+      implicit val followKarttanaFormat = Json.format[FollowKarttana]
+      val json = Json.toJson(followKarttana)
 
-    // レストランの住所をgeocodingしてcase classに入れる
-    val geo = Geocoder.create(ConfigFactory.load().getString("apiKey"))
-    val followKarttana:Seq[FollowKarttana] = for(karttana <- results) yield {
-      val location = geo.lookup(karttana._6).head.geometry.location
-      FollowKarttana(karttana._1, karttana._2, karttana._3, karttana._4, karttana._5, location.latitude, location.longitude)
+      val latPath = JsPath \ "location" \ "lat"
+
+      Ok(views.html.main())
     }
-
-    implicit val followKarttanaFormat = Json.format[FollowKarttana]
-    val resultJson = Json.toJson(followKarttana)
-
-    Ok(views.html.main())
   }
-
-
 }

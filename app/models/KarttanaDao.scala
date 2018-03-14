@@ -31,7 +31,6 @@ object KarttanaDao {
       karttana <- Karttana if karttana.userId === relation.followerId
       restaurant <- Restaurants if restaurant.id === karttana.restaurantId
     } yield (karttana.userId, karttana.star, karttana.sana, karttana.restaurantId, karttana.createdAt, restaurant.address)
-    val results = db.run(query.result)
-    results
+    db.run(query.result)
   }
 }

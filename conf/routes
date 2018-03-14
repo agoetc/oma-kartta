@@ -6,6 +6,7 @@ GET     /signup                             controllers.IndexController.signup
 POST    /register                           controllers.UserController.register
 GET     /signout                            controllers.IndexController.signout
 GET     /main                               controllers.IndexController.main
+GET     /getkarttana                           controllers.IndexController.getKarttana
 
 GET	    /user/detail/:id		            controllers.UserController.userDetail(id: String)
 

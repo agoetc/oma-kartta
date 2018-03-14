@@ -63,10 +63,12 @@ class IndexController @Inject()(cc: ControllerComponents) extends AbstractContro
     Redirect(routes.IndexController.index()).withNewSession
   }
 
-
+  def main = Action {
+    Ok(views.html.main());
+  }
   case class FollowKarttana(userId: String, star: Int, sana: String, restaurantId: Int, createdAt: Date, lat: Double, lng: Double)
 
-  def main =  Action.async { implicit request =>
+  def getKarttana =  Action.async { implicit request =>
     val user_id = request.session.get("user_id").getOrElse("")
     // フォローしているユーザーのカルタナを取得
     val results = KarttanaDao.getFollowKarttana(user_id)
@@ -77,11 +79,7 @@ class IndexController @Inject()(cc: ControllerComponents) extends AbstractContro
         FollowKarttana(karttana._1, karttana._2, karttana._3, karttana._4, karttana._5, location.latitude, location.longitude)
       }
       implicit val followKarttanaFormat = Json.format[FollowKarttana]
-      val json = Json.toJson(followKarttana)
-
-      val latPath = JsPath \ "location" \ "lat"
-
-      Ok(views.html.main())
+      Ok(Json.toJson(followKarttana))
     }
   }
 }

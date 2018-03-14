@@ -1,3 +1,12 @@
+$.getJSON(
+    "/getkarttana", //リクエストURL
+    null,       //送信データ
+    function(data, status) {
+
+        console.log(data)// 通信成功時の処理
+    }
+);
+
 
 function initMap(){
     var map = new google.maps.Map(document.getElementById('map'), {

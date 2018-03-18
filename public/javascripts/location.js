@@ -1,11 +1,37 @@
-$.getJSON(
-    "/getkarttana", //リクエストURL
-    null,       //送信データ
-    function(data, status) {
 
-        console.log(data)// 通信成功時の処理
-    }
-);
+// function initialize(json){
+//
+//     var map = new google.maps.Map(document.getElementById('map'), {
+//         center: "", // 地図の中心を指定
+//         zoom: 17// 地図のズームを指定
+//     });
+//
+//     if (navigator.geolocation) {
+//         navigator.geolocation.getCurrentPosition(function(position) {
+//             map.setCenter({
+//                 lat: position.coords.latitude,
+//                 lng: position.coords.longitude
+//             });
+//         });
+//     }
+//
+//     json.forEach(function (value) {
+//         console.log(value);
+//
+//         var marker = new google.maps.Marker({ // マーカーの追加
+//             position: new google.maps.LatLng(value.lat,value.lng), // マーカーを立てる位置を指定
+//             map: map // マーカーを立てる地図を指定
+//         });
+//
+//         // var obj = {
+//         //     position : new google.maps.LatLng(value.lat,value.lng),
+//         //     map : map
+//         // };
+//         // var marker = new google.maps.Marker(obj);
+//     })
+// }
+
+
 
 
 function initMap(){
@@ -21,8 +47,9 @@ function initMap(){
             var pushpos;
             var geocoder = new google.maps.Geocoder();
 
-            map.setCenter({lat: position.coords.latitude,
-                           lng: position.coords.longitude
+            map.setCenter({
+                lat: position.coords.latitude,
+                lng: position.coords.longitude
             });
 
             var marker = new google.maps.Marker({ // マーカーの追加

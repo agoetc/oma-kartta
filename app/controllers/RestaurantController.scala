@@ -5,27 +5,25 @@ import javax.inject._
 import play.api.mvc._
 import play.api.data._
 import play.api.data.Forms._
+import play.api.libs.json._
+import play.api.libs.json.Writes._
 import slick.driver.MySQLDriver.api._
+
 import models.Tables._
 
 import scala.concurrent._
 import ExecutionContext.Implicits.global
-import scala.concurrent.duration._
-import scala.util.{Failure, Success}
 
 import scala.concurrent.duration._
 import scala.language.postfixOps
 
+import java.util.Date
+import com.koddi.geocoder.Geocoder
+import com.typesafe.config.ConfigFactory
+import models._
+
 @Singleton
 class RestaurantController @Inject()(cc: ControllerComponents) extends AbstractController(cc){
-
-//  def index(area: Option[String], keyword: Option[String]) = Action.async{
-//    val db = Database.forConfig("mysqldb")
-//    val restaurants = db.run(Restaurants.filter(restaurant => (restaurant.address like "%" + area.getOrElse("") + "%") &&
-//      (restaurant.text like "%" + keyword.getOrElse("") + "%")).result)
-//    restaurants.map(restaurant => Ok(views.html.restaurant.restaurantlist(restaurant)))
-//
-//  }
 
   def restaurantDetail(id:Int) = Action.async{ implicit request =>
     val db = Database.forConfig("mysqldb")
@@ -33,7 +31,7 @@ class RestaurantController @Inject()(cc: ControllerComponents) extends AbstractC
     restaurant.map(restaurant => Ok(views.html.restaurant.restaurant(restaurant.head)).flashing("test"->"ははは"))
   }
 
-  def addMap() = Action{
+  def addMap() = Action {
     Ok(views.html.restaurant.restaurantadd())
   }
 
@@ -72,7 +70,7 @@ class RestaurantController @Inject()(cc: ControllerComponents) extends AbstractC
     mapping(
       "name" -> nonEmptyText,
       "kana" -> nonEmptyText,
-      "text" -> optional(text),
+      "text" -> optional(text)
     )(RestaurantNewForm.apply)(RestaurantNewForm.unapply)
   )
 
@@ -137,4 +135,23 @@ class RestaurantController @Inject()(cc: ControllerComponents) extends AbstractC
     db.run(Karttana.map(karttana=> (karttana.userId, karttana.restaurantId, karttana.star, karttana.sana))
       += ((user_id, restaurant_id, form.star, form.sana)))
   }
+
+  case class FollowKarttana(userId: String, star: Int, sana: String, restaurantId: Int, createdAt: Date, lat: Double, lng: Double)
+
+  def getKarttana =  Action.async { implicit request =>
+    val user_id = request.session.get("user_id").getOrElse("")
+    // フォローしているユーザーのカルタナを取得
+    val results = KarttanaDao.getFollowKarttana(user_id)
+    results.map { karttana =>
+      val geo = Geocoder.create(ConfigFactory.load().getString("apiKey"))
+      val followKarttana : Seq[FollowKarttana] = for(karttana <- karttana) yield {
+        val location = geo.lookup(karttana._6).head.geometry.location
+        FollowKarttana(karttana._1, karttana._2, karttana._3, karttana._4, karttana._5, location.latitude, location.longitude)
+      }
+      implicit val followKarttanaFormat = Json.format[FollowKarttana]
+      Ok(Json.toJson(followKarttana))
+    }
+  }
+
+
 }

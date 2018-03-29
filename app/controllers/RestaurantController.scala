@@ -152,6 +152,17 @@ class RestaurantController @Inject()(cc: ControllerComponents) extends AbstractC
       Ok(Json.toJson(followKarttana))
     }
   }
+  case class Restaurant(id: Int, name: String, kana: String, text: Option[String] = None, postalCode: String, address: String)
+
+  def getRestaurant(id: Int) = Action.async { implicit request =>
+    val results = RestaurantDao.getById(id)
+    results.map { restaurants =>
+      val restaurant = restaurants.head
+      val sendRestaurant = Restaurant(restaurant.id, restaurant.name, restaurant.kana, restaurant.text, restaurant.postalCode, restaurant.address)
+      implicit val restaurantFormat = Json.format[Restaurant]
+      Ok(Json.toJson(sendRestaurant))
+    }
+  }
 
 
 }

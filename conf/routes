@@ -7,7 +7,7 @@ POST    /register                           controllers.UserController.register
 GET     /signout                            controllers.IndexController.signout
 GET     /main                               controllers.IndexController.main
 GET     /getkarttana                        controllers.RestaurantController.getKarttana
-#GET     /getrestaurant                      controllers.RestaurantController.getRestaurant
+GET     /getrestaurant/:id                  controllers.RestaurantController.getRestaurant(id: Int)
 
 GET	    /user/detail/:id		            controllers.UserController.userDetail(id: String)
 

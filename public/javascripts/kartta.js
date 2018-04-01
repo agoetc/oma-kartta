@@ -51,7 +51,6 @@ function setMarker(map,karttanaJson) {
 }
 
 function createContent(restaurantJson, karttanaJson) {
-    console.log(karttanaJson);
     return '' +
         '<table class="table">' +
         '<thead>' +

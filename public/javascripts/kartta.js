@@ -23,28 +23,52 @@ function initialize(json) {
 }
 
 
-function setMarker(map,json) {
+function setMarker(map,karttanaJson) {
     let marker = [];
+    var infoWindow = new google.maps.InfoWindow({});
 
-    for (let i in json) {
+    for (let i in karttanaJson) {
         marker[i] = new google.maps.Marker({ // マーカーの追加
-            position: new google.maps.Marker({lat: json[i].lat, lng: json[i].lng}), // マーカーを立てる位置を指定
+            position: new google.maps.Marker({lat: karttanaJson[i].lat, lng: karttanaJson[i].lng}), // マーカーを立てる位置を指定
             map: map // マーカーを立てる地図を指定
         });
 
-        marker[i].addListener('click', function () { // マーカーをクリックしたとき
+
+        /* マーカーをクリックしたとき
+         * jsonからinfoWindowを作成する.
+         */
+        marker[i].addListener('click', function () {
             $.getJSON(
-                "/getrestaurant/" + json[i]['restaurantId'],
-                function (json, status) {
-                    var infoWindow = new google.maps.InfoWindow({ // 吹き出しの追加
-                        /* 吹き出しに表示する要素 */
-                        content: '<div class="sample">'+ json.name + '</div>'
-                    });
+                "/getrestaurant/" + karttanaJson[i]['restaurantId'],
+                function (restaurantJson, status) {
+                    infoWindow.setContent(createContent(restaurantJson, karttanaJson[i]));
+                    map.panTo(marker[i]['position']);
                     infoWindow.open(map, marker[i]); // 吹き出しの表示
                 });
         });
 
     }
+}
+
+function createContent(restaurantJson, karttanaJson) {
+    console.log(karttanaJson);
+    return '' +
+        '<table class="table">' +
+        '<thead>' +
+        '   <tr><h4><a href="/restaurant/detail/' + restaurantJson.id + '">' +
+        restaurantJson.name + '</a></h4></tr>' +
+        '</thead>' +
+        '  <tbody>' +
+        '    <tr>' +
+        '      <td>詳細</td>' +
+        '      <td>' + restaurantJson.text + '</td>' +
+        '    </tr>' +
+        '    <tr>' +
+        '      <td>サナ</td>' +
+        '      <td>' + karttanaJson.sana + '</td>' +
+        '    </tr>' +
+        '  </tbody>' +
+        '</table>';
 }
 
 function setCenter(map) {

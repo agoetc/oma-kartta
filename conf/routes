@@ -13,9 +13,8 @@ GET	    /user/detail/:id		            controllers.UserController.userDetail(id: 
 
 GET     /user                               controllers.UserController.index(username: Option[String],userID: Option[String])
 GET     /restaurant/add                     controllers.RestaurantController.addMap
-GET     /restaurant/new                     controllers.RestaurantController.restaurantAdd
 POST    /restaurant/new                     controllers.RestaurantController.contentPost
-POST    /restaurant/register                controllers.RestaurantController.register
+POST    /restaurant/register                controllers.RestaurantController.createRestaurant
 GET     /restaurant/detail/:id              controllers.RestaurantController.restaurantDetail(id:Int)
 POST    /restaurant/detail/:id/karttanaAdd  controllers.RestaurantController.karttanaAdd(id: Int)
 

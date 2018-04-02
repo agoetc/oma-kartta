@@ -25,21 +25,6 @@ import models._
 @Singleton
 class RestaurantController @Inject()(cc: ControllerComponents) extends AbstractController(cc){
 
-  def restaurantDetail(id:Int) = Action.async{ implicit request =>
-    val restaurant = RestaurantDao.getById(id)
-    restaurant.map(restaurant =>
-      restaurant match {
-        case Nil => Ok(views.html.error.error("404", "ページが見つかりませんでした"))
-        case _ => Ok(views.html.restaurant.restaurant(restaurant.head))
-
-      }
-    )
-  }
-
-  def addMap() = Action {
-    Ok(views.html.restaurant.restaurantadd())
-  }
-
   case class MapContent(content: String)
 
   val mapContent = Form(
@@ -48,71 +33,69 @@ class RestaurantController @Inject()(cc: ControllerComponents) extends AbstractC
     )(MapContent.apply)(MapContent.unapply)
   )
 
-  def contentPost = Action{ implicit request =>
-    mapContent.bindFromRequest.fold(
-      errors => Ok(views.html.main()),
-      form => {   // geocoderでもらった、郵便番号と住所を取得する
-        val postal_code = form.content.split(' ').apply(0).takeRight(8)
-        val address = form.content.split(' ').apply(1)
-        Redirect("/restaurant/new").withSession(request.session + ("postal_code" -> postal_code) + ("address" -> address))
-      }
-    )
-  }
-
-  def restaurantAdd = Action{implicit request =>
-    //セッションが存在するとき
-    val posbool = request.session.get("postal_code").isEmpty
-    val addressbool = request.session.get("address").isEmpty
-    (posbool,addressbool) match {
-      case (false,false) => Ok(views.html.restaurant.restaurantaddform())
-      case _ => Redirect("/main")
-    }
-  }
-
-  case class RestaurantNewForm(name: String, kana: String,text: Option[String])
 
   val newForm = Form(
     mapping(
       "name" -> nonEmptyText,
       "kana" -> nonEmptyText,
-      "text" -> optional(text)
-    )(RestaurantNewForm.apply)(RestaurantNewForm.unapply)
+      "text" -> optional(text),
+      "postal_code" -> nonEmptyText,
+      "address" -> nonEmptyText
+    )(RestaurantDao.RestaurantNewForm.apply)(RestaurantDao.RestaurantNewForm.unapply)
   )
 
-  def register = Action{implicit request =>
-    newForm.bindFromRequest.fold(
-      errors => Ok(views.html.restaurant.restaurantaddform()),
-      form => {
-        // insertしたrestaurantのid取得
-        val futureId :Future[Int] = restaurantCreate(form, request)
-        // futureで値を取得できたらリダイレクト
-        Await.ready(futureId, 20 second)
+  case class KarttanaCreate(star:Int, sana: String)
 
-        if(futureId.isCompleted){
-          val id = futureId.value.get.get
-          Redirect(s"/restaurant/detail/${id}").withSession(request.session - "postal_code").withSession(request.session -"address")
-        }else{
-          Redirect("/main")
-        }
+  val karttanaCreateForm = Form(
+    mapping(
+      "star" -> number,
+      "sana" -> nonEmptyText
+    )(KarttanaCreate.apply)(KarttanaCreate.unapply)
+  )
+
+  case class FollowKarttana(userId: String, star: Int, sana: String, restaurantId: Int, createdAt: Date, lat: Double, lng: Double)
+  case class Restaurant(id: Int, name: String, kana: String, text: Option[String] = None, postalCode: String, address: String)
+
+
+  def restaurantDetail(id:Int) = Action.async{ implicit request =>
+    val restaurant = RestaurantDao.getById(id)
+    restaurant.map(restaurant =>
+      restaurant match {
+        case Nil => BadRequest(views.html.error.error("404", "ページが見つかりませんでした"))
+        case _ => Ok(views.html.restaurant.restaurant(restaurant.head))
+      }
+    )
+  }
+
+  def addMap() = Action {
+    Ok(views.html.restaurant.restaurantadd())
+  }
+
+
+  def contentPost = Action{ implicit request =>
+    mapContent.bindFromRequest.fold(
+      errors => Ok(views.html.error.error("500", "内部エラーが発生しました")),
+      form => {   // geocoderでもらった、郵便番号と住所を取得する
+        val postal_code = form.content.split(' ').apply(0).takeRight(8)
+        val address = form.content.split(' ').apply(1)
+        Ok(views.html.restaurant.restaurantaddform(postal_code, address))
       }
     )
   }
 
 
-
-  def restaurantCreate(form: RestaurantNewForm, request: Request[AnyContent]) :Future[Int] ={
-    val db = Database.forConfig("mysqldb")
-    val id: Future[Int] = (request.session.get("postal_code"), request.session.get("address")) match{
-        // セッションにpostal_codeとaddressが存在するとき
-      case (Some(postal_code),Some(address)) =>
-        val action = Restaurants returning Restaurants.map(_.id) +=
-          RestaurantsRow(0,form.name, form.kana, form.text, postal_code, address)
-        db.run(action)
-          //　セッションがないときの処理
-//      case (_,_) =>
-    }
-
-    return id
+  def createRestaurant = Action.async { implicit request =>
+    newForm.bindFromRequest.fold(
+      errors =>{
+        Future(BadRequest(views.html.error.error("500", "内部エラー")))
+      },
+      form => {
+        // insertしたrestaurantのid取得
+        RestaurantDao.createRestaurant(form).map { id =>
+          Redirect(s"/restaurant/detail/${id}")
+        }
+      }
+    )
   }
 
   def karttanaAdd(id: Int) = Action{implicit request =>
@@ -126,14 +109,6 @@ class RestaurantController @Inject()(cc: ControllerComponents) extends AbstractC
     )
   }
 
-  case class KarttanaCreate(star:Int, sana: String)
-  val karttanaCreateForm = Form(
-    mapping(
-      "star" -> number,
-      "sana" -> nonEmptyText
-    )(KarttanaCreate.apply)(KarttanaCreate.unapply)
-  )
-
   def karttanaCreate(form: KarttanaCreate,restaurant_id: Int,request:Request[AnyContent]){
     val user_id = request.session.get("user_id").getOrElse("")
     val db = Database.forConfig("mysqldb")
@@ -141,7 +116,6 @@ class RestaurantController @Inject()(cc: ControllerComponents) extends AbstractC
       += ((user_id, restaurant_id, form.star, form.sana)))
   }
 
-  case class FollowKarttana(userId: String, star: Int, sana: String, restaurantId: Int, createdAt: Date, lat: Double, lng: Double)
 
   def getKarttana =  Action.async { implicit request =>
     val user_id = request.session.get("user_id").getOrElse("")
@@ -157,7 +131,6 @@ class RestaurantController @Inject()(cc: ControllerComponents) extends AbstractC
       Ok(Json.toJson(followKarttana))
     }
   }
-  case class Restaurant(id: Int, name: String, kana: String, text: Option[String] = None, postalCode: String, address: String)
 
   def getRestaurant(id: Int) = Action.async { implicit request =>
     val results = RestaurantDao.getById(id)

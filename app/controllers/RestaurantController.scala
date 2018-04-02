@@ -26,9 +26,14 @@ import models._
 class RestaurantController @Inject()(cc: ControllerComponents) extends AbstractController(cc){
 
   def restaurantDetail(id:Int) = Action.async{ implicit request =>
-    val db = Database.forConfig("mysqldb")
-    val restaurant = db.run(Restaurants.filter(restaurant => restaurant.id === id).result)
-    restaurant.map(restaurant => Ok(views.html.restaurant.restaurant(restaurant.head)).flashing("test"->"ははは"))
+    val restaurant = RestaurantDao.getById(id)
+    restaurant.map(restaurant =>
+      restaurant match {
+        case Nil => Ok(views.html.error.error("404", "ページが見つかりませんでした"))
+        case _ => Ok(views.html.restaurant.restaurant(restaurant.head))
+
+      }
+    )
   }
 
   def addMap() = Action {

@@ -7,7 +7,6 @@ import scala.util.{Failure, Success}
 import scala.concurrent._
 import scala.concurrent.ExecutionContext.Implicits.global
 import com.typesafe.config.ConfigFactory
-import controllers.RestaurantController
 
 import scala.concurrent.duration._
 

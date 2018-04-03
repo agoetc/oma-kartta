@@ -44,13 +44,12 @@ class RestaurantController @Inject()(cc: ControllerComponents) extends AbstractC
     )(RestaurantDao.RestaurantNewForm.apply)(RestaurantDao.RestaurantNewForm.unapply)
   )
 
-  case class KarttanaCreate(star:Int, sana: String)
 
-  val karttanaCreateForm = Form(
+  val createKarttanaForm = Form(
     mapping(
       "star" -> number,
       "sana" -> nonEmptyText
-    )(KarttanaCreate.apply)(KarttanaCreate.unapply)
+    )(KarttanaDao.CreateKarttana.apply)(KarttanaDao.CreateKarttana.unapply)
   )
 
   case class FollowKarttana(userId: String, star: Int, sana: String, restaurantId: Int, createdAt: Date, lat: Double, lng: Double)
@@ -98,24 +97,21 @@ class RestaurantController @Inject()(cc: ControllerComponents) extends AbstractC
     )
   }
 
-  def karttanaAdd(id: Int) = Action{implicit request =>
-    karttanaCreateForm.bindFromRequest.fold(
+  def addKarttana(id: Int) = Action { implicit request =>
+    createKarttanaForm.bindFromRequest.fold(
       errors =>
-        Ok(views.html.restaurant.restaurantadd()),
+        BadRequest(views.html.error.error("500", "内部エラー")),
       form => {
-        karttanaCreate(form,id,request)
+
+        //　ログインしていればカルタナ作成
+        request.session.get("user_id") match {
+          case Some(user_id) => KarttanaDao.createKarttana(form, id, user_id)
+          case None => Redirect("/")
+        }
         Redirect(s"/restaurant/detail/${id}")
       }
     )
   }
-
-  def karttanaCreate(form: KarttanaCreate,restaurant_id: Int,request:Request[AnyContent]){
-    val user_id = request.session.get("user_id").getOrElse("")
-    val db = Database.forConfig("mysqldb")
-    db.run(Karttana.map(karttana=> (karttana.userId, karttana.restaurantId, karttana.star, karttana.sana))
-      += ((user_id, restaurant_id, form.star, form.sana)))
-  }
-
 
   def getKarttana =  Action.async { implicit request =>
     val user_id = request.session.get("user_id").getOrElse("")

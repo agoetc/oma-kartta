@@ -33,4 +33,11 @@ object KarttanaDao {
     } yield (karttana.userId, karttana.star, karttana.sana, karttana.restaurantId, karttana.createdAt, restaurant.address)
     db.run(query.result)
   }
+
+  case class CreateKarttana(star:Int, sana: String)
+
+  def createKarttana(form: CreateKarttana ,restaurant_id: Int, user_id: String) = {
+    db.run(Karttana.map(karttana => (karttana.userId, karttana.restaurantId, karttana.star, karttana.sana))
+      += ((user_id, restaurant_id, form.star, form.sana)))
+  }
 }

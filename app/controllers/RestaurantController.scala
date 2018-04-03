@@ -7,14 +7,10 @@ import play.api.data._
 import play.api.data.Forms._
 import play.api.libs.json._
 import play.api.libs.json.Writes._
-import slick.driver.MySQLDriver.api._
-
-import models.Tables._
 
 import scala.concurrent._
 import ExecutionContext.Implicits.global
 
-import scala.concurrent.duration._
 import scala.language.postfixOps
 
 import java.util.Date
@@ -131,10 +127,14 @@ class RestaurantController @Inject()(cc: ControllerComponents) extends AbstractC
   def getRestaurant(id: Int) = Action.async { implicit request =>
     val results = RestaurantDao.getById(id)
     results.map { restaurants =>
-      val restaurant = restaurants.head
-      val sendRestaurant = Restaurant(restaurant.id, restaurant.name, restaurant.kana, restaurant.text, restaurant.postalCode, restaurant.address)
-      implicit val restaurantFormat = Json.format[Restaurant]
-      Ok(Json.toJson(sendRestaurant))
+      restaurants match {
+        case nonEmpty =>
+          val restaurant = restaurants.head
+          val sendRestaurant = Restaurant(restaurant.id, restaurant.name, restaurant.kana, restaurant.text, restaurant.postalCode, restaurant.address)
+          implicit val restaurantFormat = Json.format[Restaurant]
+          Ok(Json.toJson(sendRestaurant))
+        case _ =>  BadRequest(views.html.error.error("500", "内部エラーが発生しました"))
+      }
     }
   }
 

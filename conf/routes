@@ -3,7 +3,7 @@ GET     /                                   controllers.IndexController.index
 GET     /signin                             controllers.IndexController.signin
 POST    /signin                             controllers.IndexController.signincheck
 GET     /signup                             controllers.IndexController.signup
-POST    /register                           controllers.UserController.register
+POST    /register                           controllers.UserController.createUser
 GET     /signout                            controllers.IndexController.signout
 GET     /main                               controllers.IndexController.main
 GET     /getkarttana                        controllers.RestaurantController.getKarttana

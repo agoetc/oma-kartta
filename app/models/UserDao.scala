@@ -29,4 +29,11 @@ object UserDao {
     catch { case e: TimeoutException => false }
   }
 
+  case class UserNewForm(id: String, name: String, password: String)
+
+  def createUser(form: UserNewForm) = {
+    val query = Users.map(user => (user.id, user.name, user.password)) += (form.id, form.name, form.password)
+    db.run(query)
+  }
+
 }

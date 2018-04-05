@@ -2,12 +2,10 @@ package models
 
 import slick.jdbc.MySQLProfile.api._
 import models.Tables._
-import scala.util.{Failure, Success}
 import scala.concurrent._
 import scala.concurrent.ExecutionContext.Implicits.global
 import com.typesafe.config.ConfigFactory
 import scala.concurrent._
-import scala.concurrent.duration._
 
 
 
@@ -17,16 +15,12 @@ object UserDao {
 
   def getById(id: String) ={
     val query = Users.filter(user => user.id === id).result
-    val result = db.run(query)
-    try Await.result(result,5 seconds)
-    catch { case e: TimeoutException => false }
+    db.run(query)
   }
 
-  def auth(id: String, password: String)={
+  def auth(id: String, password: String) = {
     val query = Users.filter(user => user.id === id && user.password === password).result
-    val result = db.run(query)
-    try Await.result(result,5 seconds).nonEmpty
-    catch { case e: TimeoutException => false }
+    db.run(query)
   }
 
   case class UserNewForm(id: String, name: String, password: String)
@@ -35,5 +29,4 @@ object UserDao {
     val query = Users.map(user => (user.id, user.name, user.password)) += (form.id, form.name, form.password)
     db.run(query)
   }
-
 }

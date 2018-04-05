@@ -1,7 +1,7 @@
 # Routes
 GET     /                                   controllers.IndexController.index
 GET     /signin                             controllers.IndexController.signin
-POST    /signin                             controllers.IndexController.signincheck
+POST    /signin                             controllers.IndexController.checkSignin
 GET     /signup                             controllers.IndexController.signup
 POST    /register                           controllers.UserController.createUser
 GET     /signout                            controllers.IndexController.signout

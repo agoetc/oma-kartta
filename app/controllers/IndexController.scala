@@ -6,6 +6,9 @@ import play.api.mvc._
 import play.api.data._
 import play.api.data.Forms._
 import models._
+
+import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.language.postfixOps
 
 
@@ -33,13 +36,15 @@ class IndexController @Inject()(cc: ControllerComponents) extends AbstractContro
     )(AuthForm.apply)(AuthForm.unapply))
 
 
-  def signincheck = Action { implicit request =>
+  def checkSignin = Action.async { implicit request =>
     authForm.bindFromRequest().fold(
-      errors => Ok(views.html.signin()),
-      form =>{
-        UserDao.auth(form.id,form.password) match{
-          case true => Redirect("/main").withSession ("user_id" -> form.id)
-          case false => Redirect("/signin")
+      errors => Future(BadRequest(views.html.signin())),
+      form => {
+        UserDao.auth(form.id, form.password).map { auth =>
+          auth match {
+            case Nil => Redirect("/signin")
+            case _ => Redirect("/main").withSession("user_id" -> form.id)
+          }
         }
       }
     )

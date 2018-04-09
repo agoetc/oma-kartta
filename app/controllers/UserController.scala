@@ -37,23 +37,22 @@ class UserController @Inject()(cc: ControllerComponents) extends AbstractControl
   }
 
   def userDetail(id: String) = Action.async{ implicit request =>
-    val db = Database.forConfig("mysqldb")
-    val user = db.run(Users.filter(user => user.id === id).result)
-    val authid=request.session.get("user_id").getOrElse("")
-    val follow = db.run(Relation.filter(relation => relation.followId === authid).result)
-    val follower = db.run(Relation.filter(relation => relation.followId === authid).result)
-    Await.ready(follow, 20 second)
-    Await.ready(follower, 20 second)
-    val followLen = follow.value.get.get.length
-    val followerLen = follower.value.get.get.length
+    val user = UserDao.getById(id)
+    val authId = request.session.get("user_id").getOrElse("")
+    val follow = UserDao.getFollowByUserId(authId)
+    val follower = UserDao.getFollowerByUserId(authId)
 
-    println(followLen,followerLen)
     user.map(user =>
-      authid match {
-        case authid if authid == user.head.id => Ok(views.html.user.mypage(user.head, followLen, followerLen))
-        case _ => Ok(views.html.user.user(user.head))
-      }
-    )
+      follow.map(follow =>
+        follower.map(follower =>
+          authId match {
+            case authid if authid == user.head.id =>
+              Ok(views.html.user.mypage(user.head, follow.length, follower.length))
+            case _ => Ok(views.html.user.user(user.head))
+          }
+        )
+      )
+    ).flatten.flatten
 
   }
 

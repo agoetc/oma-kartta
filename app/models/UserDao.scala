@@ -29,4 +29,14 @@ object UserDao {
     val query = Users.map(user => (user.id, user.name, user.password)) += (form.id, form.name, form.password)
     db.run(query)
   }
+
+  def getFollowByUserId(id: String) = {
+    val query = Relation.filter(relation => relation.followId === id).result
+    db.run(query)
+  }
+
+  def getFollowerByUserId(id: String) = {
+    val query = Relation.filter(relation => relation.followerId === id).result
+    db.run(query)
+  }
 }

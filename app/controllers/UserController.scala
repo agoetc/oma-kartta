@@ -43,7 +43,8 @@ class UserController @Inject()(cc: ControllerComponents) extends AbstractControl
           authId match {
             case authid if authid == user.head.id =>
               Ok(views.html.user.mypage(user.head, follow.length, follower.length))
-            case _ => Ok(views.html.user.user(user.head))
+            case _ =>
+              Ok(views.html.user.user(user.head))
           }
         )
       ).flatten
@@ -53,6 +54,8 @@ class UserController @Inject()(cc: ControllerComponents) extends AbstractControl
 
   def index(username: Option[String], userID: Option[String]) = Action.async {
     val users = UserDao.searchUser(username.getOrElse(""), userID.getOrElse(""))
-    users.map(user => Ok(views.html.restaurant.userlist(user)))
+    users.map(user =>
+      Ok(views.html.restaurant.userlist(user))
+    )
   }
 }

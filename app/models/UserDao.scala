@@ -4,8 +4,6 @@ import slick.jdbc.MySQLProfile.api._
 import models.Tables._
 import scala.concurrent._
 import scala.concurrent.ExecutionContext.Implicits.global
-import com.typesafe.config.ConfigFactory
-import scala.concurrent._
 
 
 
@@ -39,4 +37,11 @@ object UserDao {
     val query = Relation.filter(relation => relation.followerId === id).result
     db.run(query)
   }
+
+  def searchUser(userName: String, userId: String) = {
+    val query = Users.filter(user => (user.name like "%" + userName + "%") &&
+      (user.id like "%" + userId + "%")).result
+    db.run(query)
+  }
+
 }

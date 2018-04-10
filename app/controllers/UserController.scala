@@ -4,15 +4,10 @@ import javax.inject._
 import play.api.mvc._
 import play.api.data._
 import play.api.data.Forms._
-import slick.driver.MySQLDriver.api._
-import models.Tables._
 import models.UserDao
 import scala.concurrent._
-import scala.concurrent.duration._
 import scala.language.postfixOps
-import scala.util.{Failure, Success}
 import ExecutionContext.Implicits.global
-
 
 
 class UserController @Inject()(cc: ControllerComponents) extends AbstractController(cc){
@@ -51,17 +46,13 @@ class UserController @Inject()(cc: ControllerComponents) extends AbstractControl
             case _ => Ok(views.html.user.user(user.head))
           }
         )
-      )
-    ).flatten.flatten
-
+      ).flatten
+    ).flatten
   }
 
 
-
-  def index(username: Option[String], userID: Option[String]) = Action.async{
-    val db = Database.forConfig("mysqldb")
-    val users = db.run(Users.filter(user => (user.name like "%" + username.getOrElse("") + "%") &&
-      (user.id like "%" + userID.getOrElse("") + "%")).result)
+  def index(username: Option[String], userID: Option[String]) = Action.async {
+    val users = UserDao.searchUser(username.getOrElse(""), userID.getOrElse(""))
     users.map(user => Ok(views.html.restaurant.userlist(user)))
   }
 }

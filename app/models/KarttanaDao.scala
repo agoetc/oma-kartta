@@ -15,6 +15,11 @@ object KarttanaDao {
     db.run(query)
   }
 
+  def getByUserIdAndRestaurantId(userId: String, restaurantId: Int) = {
+    val query = Karttana.filter(karttana => karttana.userId === userId && karttana.restaurantId === restaurantId).result
+    db.run(query)
+  }
+
   def getFollowKarttana(user_id: String) = {
     val query = for {
       relation <- Relation if relation.followId === user_id

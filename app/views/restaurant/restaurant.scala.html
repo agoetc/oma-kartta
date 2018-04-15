@@ -1,7 +1,21 @@
-@(restaurant: models.Tables.Restaurants#TableElementType)
+@(restaurant: models.Tables.Restaurants#TableElementType)(implicit request: RequestHeader)
 @layout.default("店舗", restaurant.name){
+
+    @if(request.flash.get("message")) {
+        <div class="alert alert-success" role="alert">
+            @request.flash.get("message")
+        </div>
+    }
+
+    @if(request.flash.get("errorMessage")) {
+        <div class="alert alert-danger" role="alert">
+        @request.flash.get("errorMessage")
+        </div>
+    }
+
     @karttanaform(restaurant.id)
     <dev>
+
         <p>@restaurant.text</p>
     </dev>
 }

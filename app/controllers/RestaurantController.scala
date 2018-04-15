@@ -53,12 +53,17 @@ class RestaurantController @Inject()(cc: ControllerComponents) extends AbstractC
 
 
   def restaurantDetail(id:Int) = Action.async{ implicit request =>
+    val userId = request.session.get("user_id").getOrElse("")
     val restaurant = RestaurantDao.getById(id)
-    restaurant.map(restaurant =>
-      restaurant match {
-        case Nil => BadRequest(views.html.error.error("404", "ページが見つかりませんでした"))
-        case _ => Ok(views.html.restaurant.restaurant(restaurant.head))
-      }
+    val karttana = KarttanaDao.getByUserIdAndRestaurantId(userId,id)
+
+    restaurant.flatMap(restaurant =>
+      karttana.map(karttana =>
+        restaurant match {
+          case Nil => BadRequest(views.html.error.error("404", "ページが見つかりませんでした"))
+          case _ => Ok(views.html.restaurant.restaurant(restaurant.head))
+        }
+      )
     )
   }
 
@@ -96,15 +101,14 @@ class RestaurantController @Inject()(cc: ControllerComponents) extends AbstractC
   def addKarttana(id: Int) = Action { implicit request =>
     createKarttanaForm.bindFromRequest.fold(
       errors =>
-        BadRequest(views.html.error.error("500", "内部エラー")),
+        Redirect(s"/restaurant/detail/${id}").flashing("errorMessage" -> "エラーが発生しました"),
       form => {
-
         //　ログインしていればカルタナ作成
         request.session.get("user_id") match {
           case Some(user_id) => KarttanaDao.createKarttana(form, id, user_id)
           case None => Redirect("/")
         }
-        Redirect(s"/restaurant/detail/${id}")
+        Redirect(s"/restaurant/detail/${id}").flashing("message" -> "カルタナを登録しました")
       }
     )
   }
@@ -137,6 +141,5 @@ class RestaurantController @Inject()(cc: ControllerComponents) extends AbstractC
       }
     }
   }
-
 
 }

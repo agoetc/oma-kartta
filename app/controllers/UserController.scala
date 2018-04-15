@@ -37,8 +37,8 @@ class UserController @Inject()(cc: ControllerComponents) extends AbstractControl
     val follow = UserDao.getFollowByUserId(authId)
     val follower = UserDao.getFollowerByUserId(authId)
 
-    user.map(user =>
-      follow.map(follow =>
+    user.flatMap(user =>
+      follow.flatMap(follow =>
         follower.map(follower =>
           authId match {
             case authid if authid == user.head.id =>
@@ -47,8 +47,8 @@ class UserController @Inject()(cc: ControllerComponents) extends AbstractControl
               Ok(views.html.user.user(user.head))
           }
         )
-      ).flatten
-    ).flatten
+      )
+    )
   }
 
 

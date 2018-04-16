@@ -32,7 +32,8 @@ object KarttanaDao {
   case class CreateKarttana(star:Int, sana: String)
 
   def createKarttana(form: CreateKarttana ,restaurant_id: Int, user_id: String) = {
-    db.run(Karttana.map(karttana => (karttana.userId, karttana.restaurantId, karttana.star, karttana.sana))
-      += ((user_id, restaurant_id, form.star, form.sana)))
+    val query = Karttana.map(karttana =>
+      (karttana.userId, karttana.restaurantId, karttana.star, karttana.sana)) += ((user_id, restaurant_id, form.star, form.sana))
+    db.run(query)
   }
 }

@@ -18,9 +18,9 @@ object RestaurantDao {
   case class RestaurantNewForm(name: String, kana: String, text: Option[String] = None, postalCode: String, address: String)
 
   def createRestaurant(form: RestaurantNewForm) = {
-    val action = Restaurants returning Restaurants.map(_.id) +=
+    val query = Restaurants returning Restaurants.map(_.id) +=
       RestaurantsRow(0,form.name, form.kana, form.text, form.postalCode, form.address)
-    db.run(action)
+    db.run(query)
   }
 
 }

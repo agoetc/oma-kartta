@@ -37,18 +37,18 @@ class UserController @Inject()(cc: ControllerComponents) extends AbstractControl
     val follow = UserDao.getFollowByUserId(authId)
     val follower = UserDao.getFollowerByUserId(authId)
 
-    user.flatMap(user =>
-      follow.flatMap(follow =>
-        follower.map(follower =>
-          authId match {
-            case authid if authid == user.head.id =>
-              Ok(views.html.user.mypage(user.head, follow.length, follower.length))
-            case _ =>
-              Ok(views.html.user.user(user.head))
-          }
-        )
-      )
-    )
+    for {
+      user <- user
+      follow <- follow
+      follower <- follower
+    } yield {
+      authId match {
+        case authid if authid == user.head.id =>
+          Ok(views.html.user.mypage(user.head, follow.length, follower.length))
+        case _ =>
+          Ok(views.html.user.user(user.head))
+      }
+    }
   }
 
 

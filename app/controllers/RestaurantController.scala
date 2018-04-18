@@ -57,14 +57,15 @@ class RestaurantController @Inject()(cc: ControllerComponents) extends AbstractC
     val restaurant = RestaurantDao.getById(id)
     val karttana = KarttanaDao.getByUserIdAndRestaurantId(userId,id)
 
-    restaurant.flatMap(restaurant =>
-      karttana.map(karttana =>
-        restaurant match {
-          case Nil => BadRequest(views.html.error.error("404", "ページが見つかりませんでした"))
-          case _ => Ok(views.html.restaurant.restaurant(restaurant.head))
-        }
-      )
-    )
+    for {
+      restaurant <- restaurant
+      karttana <- karttana
+    } yield {
+      restaurant match {
+        case Nil => BadRequest(views.html.error.error("404", "ページが見つかりませんでした"))
+        case _ => Ok(views.html.restaurant.restaurant(restaurant.head))
+      }
+    }
   }
 
   def addMap() = Action {

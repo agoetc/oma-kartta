@@ -15,6 +15,14 @@ import scala.language.postfixOps
 @Singleton
 class IndexController @Inject()(cc: ControllerComponents) extends AbstractController(cc){
 
+  val authForm = Form(
+    mapping(
+      "id" -> nonEmptyText,
+      "password" -> nonEmptyText
+    )(AuthForm.apply)(AuthForm.unapply))
+
+  case class AuthForm(id: String, password: String)
+
   def index = Action{
     Ok(views.html.index())
   }
@@ -26,15 +34,6 @@ class IndexController @Inject()(cc: ControllerComponents) extends AbstractContro
   def signup = Action{
     Ok(views.html.signup())
   }
-
-  case class AuthForm(id: String, password: String)
-
-  val authForm = Form(
-    mapping(
-      "id" -> nonEmptyText,
-      "password" -> nonEmptyText
-    )(AuthForm.apply)(AuthForm.unapply))
-
 
   def checkSignin = Action.async { implicit request =>
     authForm.bindFromRequest().fold(

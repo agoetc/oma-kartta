@@ -31,28 +31,34 @@ class UserController @Inject()(cc: ControllerComponents) extends AbstractControl
     )
   }
 
-  def userDetail(id: String) = Action.async{ implicit request =>
+  def userDetail(id: String) = Action.async { implicit request =>
     val user = UserDao.getById(id)
     val authId = request.session.get("user_id").getOrElse("")
-    val follow = UserDao.getFollowByUserId(authId)
-    val follower = UserDao.getFollowerByUserId(authId)
+    val follow = UserDao.getFollowByUserId(id)
+    val follower = UserDao.getFollowerByUserId(id)
 
     for {
       user <- user
       follow <- follow
       follower <- follower
     } yield {
-      if (user.nonEmpty) {
-        authId match {
-          case authid if authid == user.head.id =>
-            Ok(views.html.user.mypage(user.head, follow.length, follower.length))
-          case _ =>
-            Ok(views.html.user.user(user.head))
-        }
-      } else {
-        BadRequest(views.html.error.error("404","ページが見つかりませんでした"))
+      user match {
+        case nonEmpty =>
+          authId match {
+            case authid if authid == user.head.id =>
+              Ok(views.html.user.mypage(user.head, follow.length, follower.length))
+            case _ =>
+              Ok(views.html.user.user(user.head, follow.length, follower.length))
+          }
+        case _ =>
+          BadRequest(views.html.error.error("404", "ページが見つかりませんでした"))
       }
     }
+  }
+
+  def mypage() = Action { implicit request =>
+    val authId = request.session.get("user_id").getOrElse("")
+    Redirect(s"/user/${authId}")
   }
 
 

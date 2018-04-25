@@ -42,11 +42,15 @@ class UserController @Inject()(cc: ControllerComponents) extends AbstractControl
       follow <- follow
       follower <- follower
     } yield {
-      authId match {
-        case authid if authid == user.head.id =>
-          Ok(views.html.user.mypage(user.head, follow.length, follower.length))
-        case _ =>
-          Ok(views.html.user.user(user.head))
+      if (user.nonEmpty) {
+        authId match {
+          case authid if authid == user.head.id =>
+            Ok(views.html.user.mypage(user.head, follow.length, follower.length))
+          case _ =>
+            Ok(views.html.user.user(user.head))
+        }
+      } else {
+        BadRequest(views.html.error.error("404","ページが見つかりませんでした"))
       }
     }
   }

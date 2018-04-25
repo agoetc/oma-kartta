@@ -9,7 +9,7 @@ GET     /main                               controllers.IndexController.main
 GET     /getkarttana                        controllers.RestaurantController.getKarttana
 GET     /getrestaurant/:id                  controllers.RestaurantController.getRestaurant(id: Int)
 
-GET	    /user/detail/:id		            controllers.UserController.userDetail(id: String)
+GET	    /user/:id		                    controllers.UserController.userDetail(id: String)
 
 GET     /user                               controllers.UserController.index(username: Option[String],userID: Option[String])
 GET     /restaurant/add                     controllers.RestaurantController.addMap

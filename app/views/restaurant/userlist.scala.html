@@ -12,7 +12,7 @@
         <tbody>
     @for(user <- users.head){
         <tr>
-            <td><a href="/user/detail/@user.id">@user.name</a></td>
+            <td><a href="/user/@user.id">@user.name</a></td>
             <td>@user.id</td>
         </tr>
     }

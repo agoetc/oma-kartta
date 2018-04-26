@@ -43,7 +43,7 @@ class UserController @Inject()(cc: ControllerComponents) extends AbstractControl
       follower <- follower
     } yield {
       user match {
-        case nonEmpty =>
+        case user if user.nonEmpty =>
           authId match {
             case authid if authid == user.head.id =>
               Ok(views.html.user.mypage(user.head, follow.length, follower.length))

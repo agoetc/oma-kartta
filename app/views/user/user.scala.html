@@ -1,6 +1,6 @@
 @(user: models.Tables.Users#TableElementType, followLen: Int, followerLen: Int)
 @layout.default("ユーザーページ", user.id){
-    <dev>
+    <a>
         <dev>
             <p>@user.name のページ</p>
             <thead class="thead-light">
@@ -15,6 +15,6 @@
                 <th>@followerLen</th>
             </tr>
         </dev>
-        <input type="button" value="フォローする" onclick="history.back()">
+        <a href="/userfollow/@user.id"> <input type="button" value="フォローする" onclick="history.back()"></a>
     </dev>
 }

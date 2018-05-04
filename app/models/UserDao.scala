@@ -45,4 +45,10 @@ object UserDao {
     db.run(query)
   }
 
+
+  def userauth(authId: String, id: String) = {
+    val query = Relation.filter(r=> r.followId===authId && r.followerId===id).result
+    db.run(query)
+  }
+
 }

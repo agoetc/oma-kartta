@@ -1,0 +1,9 @@
+@(user: models.Tables.Relation#TableElementType)
+
+<h1>フォローリスト</h1>
+@*@for(user <- users.head){*@
+    @*<tr>*@
+        @*<td><a href="/user/detail/@user.id">@user.name</a></td>*@
+        @*<td>@user.id</td>*@
+    @*</tr>*@
+@*}*@

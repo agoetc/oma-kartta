@@ -6,14 +6,14 @@ import play.api.mvc._
 import play.api.data._
 import play.api.data.Forms._
 import models._
+import utils.AuthenticatedAction
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.language.postfixOps
 
-
 @Singleton
-class IndexController @Inject()(cc: ControllerComponents) extends AbstractController(cc){
+class IndexController @Inject()(cc: ControllerComponents ,authenticatedAction: AuthenticatedAction) extends AbstractController(cc) {
 
   val authForm = Form(
     mapping(
@@ -23,15 +23,15 @@ class IndexController @Inject()(cc: ControllerComponents) extends AbstractContro
 
   case class AuthForm(id: String, password: String)
 
-  def index = Action{
+  def index = Action {
     Ok(views.html.index())
   }
 
-  def signin = Action{
+  def signin = Action {
     Ok(views.html.signin())
   }
 
-  def signup = Action{
+  def signup = Action {
     Ok(views.html.signup())
   }
 
@@ -49,14 +49,12 @@ class IndexController @Inject()(cc: ControllerComponents) extends AbstractContro
     )
   }
 
-  def signout = Action{ implicit request =>
+  def signout = authenticatedAction { implicit request =>
     Redirect(routes.IndexController.index()).withNewSession
   }
 
-  def main = Action {
+  def main = authenticatedAction {
     Ok(views.html.main())
   }
-
-
 
 }

@@ -1,7 +1,6 @@
 package controllers
 
 import javax.inject._
-
 import play.api.mvc._
 import play.api.data._
 import play.api.data.Forms._
@@ -10,16 +9,16 @@ import play.api.libs.json.Writes._
 
 import scala.concurrent._
 import ExecutionContext.Implicits.global
-
 import scala.language.postfixOps
-
 import java.util.Date
+
 import com.koddi.geocoder.Geocoder
 import com.typesafe.config.ConfigFactory
 import models._
+import utils.AuthenticatedAction
 
 @Singleton
-class RestaurantController @Inject()(cc: ControllerComponents) extends AbstractController(cc){
+class RestaurantController @Inject()(cc: ControllerComponents, authenticatedAction: AuthenticatedAction) extends AbstractController(cc){
 
   case class MapContent(content: String)
 
@@ -52,7 +51,7 @@ class RestaurantController @Inject()(cc: ControllerComponents) extends AbstractC
   case class Restaurant(id: Int, name: String, kana: String, text: Option[String] = None, postalCode: String, address: String)
 
 
-  def restaurantDetail(id:Int) = Action.async{ implicit request =>
+  def restaurantDetail(id:Int) = authenticatedAction.async { implicit request =>
     val userId = request.session.get("user_id").getOrElse("")
     val restaurant = RestaurantDao.getById(id)
     val karttana = KarttanaDao.getByUserIdAndRestaurantId(userId,id)
@@ -68,12 +67,12 @@ class RestaurantController @Inject()(cc: ControllerComponents) extends AbstractC
     }
   }
 
-  def addMap() = Action {
+  def addMap() = authenticatedAction {
     Ok(views.html.restaurant.restaurantadd())
   }
 
 
-  def contentPost = Action{ implicit request =>
+  def contentPost = authenticatedAction { implicit request =>
     mapContent.bindFromRequest.fold(
       errors => Ok(views.html.error.error("500", "内部エラーが発生しました")),
       form => {   // geocoderでもらった、郵便番号と住所を取得する
@@ -85,7 +84,7 @@ class RestaurantController @Inject()(cc: ControllerComponents) extends AbstractC
   }
 
 
-  def createRestaurant = Action.async { implicit request =>
+  def createRestaurant = authenticatedAction.async { implicit request =>
     newForm.bindFromRequest.fold(
       errors =>{
         Future(BadRequest(views.html.error.error("500", "内部エラー")))
@@ -99,7 +98,7 @@ class RestaurantController @Inject()(cc: ControllerComponents) extends AbstractC
     )
   }
 
-  def addKarttana(id: Int) = Action { implicit request =>
+  def addKarttana(id: Int) = authenticatedAction { implicit request =>
     createKarttanaForm.bindFromRequest.fold(
       errors =>
         Redirect(s"/restaurant/detail/${id}").flashing("errorMessage" -> "エラーが発生しました"),

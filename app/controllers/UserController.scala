@@ -5,12 +5,13 @@ import play.api.mvc._
 import play.api.data._
 import play.api.data.Forms._
 import models.UserDao
+import utils.AuthenticatedAction
 import scala.concurrent._
 import scala.language.postfixOps
 import ExecutionContext.Implicits.global
 
 
-class UserController @Inject()(cc: ControllerComponents) extends AbstractController(cc){
+class UserController @Inject()(cc: ControllerComponents, authenticatedAction: AuthenticatedAction) extends AbstractController(cc){
 
     val newForm = Form(
       mapping(
@@ -31,7 +32,7 @@ class UserController @Inject()(cc: ControllerComponents) extends AbstractControl
     )
   }
 
-  def userDetail(id: String) = Action.async { implicit request =>
+  def userDetail(id: String) = authenticatedAction.async { implicit request =>
     val user = UserDao.getById(id)
     val authId = request.session.get("user_id").getOrElse("")
     val follow = UserDao.getFollowByUserId(id)
@@ -56,13 +57,13 @@ class UserController @Inject()(cc: ControllerComponents) extends AbstractControl
     }
   }
 
-  def mypage() = Action { implicit request =>
+  def mypage() = authenticatedAction { implicit request =>
     val authId = request.session.get("user_id").getOrElse("")
     Redirect(s"/user/${authId}")
   }
 
 
-  def index(username: Option[String], userID: Option[String]) = Action.async {
+  def index(username: Option[String], userID: Option[String]) = authenticatedAction.async {
     val users = UserDao.searchUser(username.getOrElse(""), userID.getOrElse(""))
     users.map(user =>
       Ok(views.html.restaurant.userlist(user))

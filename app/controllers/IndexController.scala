@@ -11,9 +11,18 @@ import utils.AuthenticatedAction
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.language.postfixOps
+import scala.util.{Failure, Success}
 
 @Singleton
 class IndexController @Inject()(cc: ControllerComponents ,authenticatedAction: AuthenticatedAction) extends AbstractController(cc) {
+
+  val newForm = Form(
+    mapping(
+      "id" -> nonEmptyText,
+      "name" -> nonEmptyText,
+      "password" ->nonEmptyText
+    )(UserDao.UserNewForm.apply)(UserDao.UserNewForm.unapply)
+  )
 
   val authForm = Form(
     mapping(
@@ -22,6 +31,15 @@ class IndexController @Inject()(cc: ControllerComponents ,authenticatedAction: A
     )(AuthForm.apply)(AuthForm.unapply))
 
   case class AuthForm(id: String, password: String)
+
+  private def auth(id: String, password: String) = {
+    UserDao.auth(id, password).map { auth =>
+      auth match {
+        case Nil => Redirect("/signin")
+        case _ => Redirect("/main").withSession("user_id" -> id)
+      }
+    }
+  }
 
   def index = Action {
     Ok(views.html.index())
@@ -38,13 +56,18 @@ class IndexController @Inject()(cc: ControllerComponents ,authenticatedAction: A
   def checkSignin = Action.async { implicit request =>
     authForm.bindFromRequest().fold(
       errors => Future(BadRequest(views.html.signin())),
+      form => this.auth(form.id, form.password)
+    )
+  }
+
+  def createUser = Action.async { implicit request =>
+    newForm.bindFromRequest().fold(
+      errors => Future(BadRequest(views.html.signup())),
       form => {
-        UserDao.auth(form.id, form.password).map { auth =>
-          auth match {
-            case Nil => Redirect("/signin")
-            case _ => Redirect("/main").withSession("user_id" -> form.id)
+          UserDao.createUser(form).flatMap {
+            case Failure(e) => Future(Redirect("/signup"))
+            case Success(_)  => this.auth (form.id, form.password)
           }
-        }
       }
     )
   }

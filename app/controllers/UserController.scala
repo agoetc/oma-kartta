@@ -13,25 +13,6 @@ import ExecutionContext.Implicits.global
 
 class UserController @Inject()(cc: ControllerComponents, authenticatedAction: AuthenticatedAction) extends AbstractController(cc){
 
-    val newForm = Form(
-      mapping(
-        "id" -> nonEmptyText,
-        "name" -> nonEmptyText,
-        "password" ->nonEmptyText
-      )(UserDao.UserNewForm.apply)(UserDao.UserNewForm.unapply)
-    )
-
-
-  def createUser = Action{ implicit request =>
-    newForm.bindFromRequest().fold(
-      errors => BadRequest(views.html.signup()),
-      form => {
-        UserDao.createUser(form)
-        Redirect("/main")
-      }
-    )
-  }
-
   def userDetail(id: String) = authenticatedAction.async { implicit request =>
     val user = UserDao.getById(id)
     val authId = request.session.get("user_id").getOrElse("")

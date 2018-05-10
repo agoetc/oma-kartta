@@ -13,7 +13,7 @@ object UserDao {
 
   val db = Database.forConfig("mysqldb")
 
-  def getById(id: String) ={
+  def getById(id: String) = {
     val query = Users.filter(user => user.id === id).result
     db.run(query)
   }
@@ -25,7 +25,8 @@ object UserDao {
 
 
   def createUser(form: UserNewForm) = {
-    val query = Users.map(user => (user.id, user.name, user.password)) += (form.id, form.name, form.password)
+    val query = (Users.map(user => (user.id, user.name, user.password))
+      += (form.id, form.name, form.password)).asTry
     db.run(query)
   }
 

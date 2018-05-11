@@ -50,7 +50,7 @@ class IndexController @Inject()(cc: ControllerComponents ,authenticatedAction: A
   }
 
   def signup = Action {
-    Ok(views.html.signup())
+    Ok(views.html.signup(newForm))
   }
 
   def checkSignin = Action.async { implicit request =>
@@ -62,7 +62,7 @@ class IndexController @Inject()(cc: ControllerComponents ,authenticatedAction: A
 
   def createUser = Action.async { implicit request =>
     newForm.bindFromRequest().fold(
-      errors => Future(BadRequest(views.html.signup())),
+      errors => Future(BadRequest(views.html.signup(errors))),
       form => {
           UserDao.createUser(form).flatMap {
             case Failure(e) => Future(Redirect("/signup"))

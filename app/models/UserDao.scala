@@ -9,8 +9,6 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 object UserDao {
 
-  case class UserNewForm(id: String, name: String, password: String)
-
   val db = Database.forConfig("mysqldb")
 
   def getById(id: String) = {
@@ -23,8 +21,7 @@ object UserDao {
     db.run(query)
   }
 
-
-  def createUser(form: UserNewForm) = {
+  def createUser(form: forms.UserForm.UserNewForm) = {
     val query = (Users.map(user => (user.id, user.name, user.password))
       += (form.id, form.name, form.password)).asTry
     db.run(query)

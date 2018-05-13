@@ -23,7 +23,9 @@ class IndexController @Inject()(
   private def auth(id: String, password: String) = {
     UserDao.auth(id, password).map { auth =>
       auth match {
-        case Nil => Redirect("/signin")
+        case Nil =>
+          Redirect("/signin")
+          .flashing("errorMessage" -> "サインインに失敗しました。もう一度入力してください")
         case _ => Redirect("/main").withSession("user_id" -> id)
       }
     }
@@ -33,17 +35,25 @@ class IndexController @Inject()(
     Ok(views.html.index())
   }
 
-  def signin = Action {
-    Ok(views.html.signin())
+  def main = authenticatedAction {
+    Ok(views.html.main())
+  }
+
+  def signin = messagesAction { implicit request: MessagesRequest[AnyContent] =>
+    Ok(views.html.signin(signinForm))
   }
 
   def signup = messagesAction { implicit request: MessagesRequest[AnyContent] =>
     Ok(views.html.signup(createForm))
   }
 
-  def checkSignin = Action.async { implicit request =>
+  def signout = authenticatedAction { implicit request =>
+    Redirect(routes.IndexController.index()).withNewSession
+  }
+
+  def checkSignin = messagesAction.async { implicit request: MessagesRequest[AnyContent] =>
     signinForm.bindFromRequest().fold(
-      errors => Future(BadRequest(views.html.signin())),
+      errors => Future(Ok(views.html.signin(errors))),
       form => this.auth(form.id, form.password)
     )
   }
@@ -54,18 +64,11 @@ class IndexController @Inject()(
         Future(BadRequest(views.html.signup(errors))),
       form =>
           UserDao.createUser(form).flatMap {
-            case Failure(e) => Future(Redirect("/signup").flashing("errorMessage" -> "エラーが発生しました。お手数ですがもう一度入力してください"))
+            case Failure(e) =>
+              Future(Redirect("/signup").flashing("errorMessage" -> "エラーが発生しました。お手数ですがもう一度入力してください"))
             case Success(_) => this.auth(form.id, form.password)
           }
     )
-  }
-
-  def signout = authenticatedAction { implicit request =>
-    Redirect(routes.IndexController.index()).withNewSession
-  }
-
-  def main = authenticatedAction {
-    Ok(views.html.main())
   }
 
 }

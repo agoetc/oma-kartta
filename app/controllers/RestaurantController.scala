@@ -103,7 +103,7 @@ class RestaurantController @Inject()(cc: ControllerComponents, authenticatedActi
       errors =>
         Redirect(s"/restaurant/detail/${id}").flashing("errorMessage" -> "エラーが発生しました"),
       form => {
-        //　ログインしていればカルタナ作成
+        //　サインインしていればカルタナ作成
         request.session.get("user_id") match {
           case Some(user_id) => KarttanaDao.createKarttana(form, id, user_id)
           case None => Redirect("/")

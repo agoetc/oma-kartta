@@ -6,9 +6,9 @@ import play.api.data.validation.Constraints
 
 object UserForm {
 
-  case class UserNewForm(id: String, name: String, password: String)
+  case class CreateForm(id: String, name: String, password: String)
 
-  val newForm = Form(
+  val createForm = Form(
     mapping(
       "id" -> nonEmptyText(minLength = 4,maxLength = 20)
         .verifying(
@@ -16,15 +16,15 @@ object UserForm {
             error = "形式が不正です。記号は _ が使用できます")),
       "name" -> nonEmptyText(maxLength = 20),
       "password" ->nonEmptyText(minLength = 6,maxLength = 20)
-    )(UserNewForm.apply)(UserNewForm.unapply))
+    )(CreateForm.apply)(CreateForm.unapply))
 
 
-  case class AuthForm(id: String, password: String)
+  case class SigninForm(id: String, password: String)
 
-  val authForm = Form(
+  val signinForm = Form(
     mapping(
       "id" -> nonEmptyText,
       "password" -> nonEmptyText
-    )(AuthForm.apply)(AuthForm.unapply))
+    )(SigninForm.apply)(SigninForm.unapply))
 
 }

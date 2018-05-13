@@ -1,5 +1,4 @@
-@import forms.UserForm.UserNewForm
-@(userNewForm: Form[UserNewForm])(implicit request: MessagesRequestHeader)
+@(userNewForm: Form[forms.UserForm.CreateForm])(implicit request: MessagesRequestHeader)
 @implicitField = @{ FieldConstructor(layout.fieldConstructor.f) }
 @import helper._
 @default("新規登録ページ", "新規登録ページ"){

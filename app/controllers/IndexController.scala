@@ -3,11 +3,8 @@ package controllers
 
 import javax.inject._
 import play.api.mvc._
-import play.api.data._
 import models._
-import play.api.data.validation.Constraints
 import utils.AuthenticatedAction
-
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.language.postfixOps
@@ -41,18 +38,18 @@ class IndexController @Inject()(
   }
 
   def signup = messagesAction { implicit request: MessagesRequest[AnyContent] =>
-    Ok(views.html.signup(newForm))
+    Ok(views.html.signup(createForm))
   }
 
   def checkSignin = Action.async { implicit request =>
-    authForm.bindFromRequest().fold(
+    signinForm.bindFromRequest().fold(
       errors => Future(BadRequest(views.html.signin())),
       form => this.auth(form.id, form.password)
     )
   }
 
   def createUser = messagesAction.async { implicit request: MessagesRequest[AnyContent] =>
-    newForm.bindFromRequest().fold(
+    createForm.bindFromRequest().fold(
       errors =>
         Future(BadRequest(views.html.signup(errors))),
       form =>

@@ -21,7 +21,7 @@ object UserDao {
     db.run(query)
   }
 
-  def createUser(form: forms.UserForm.UserNewForm) = {
+  def createUser(form: forms.UserForm.CreateForm) = {
     val query = (Users.map(user => (user.id, user.name, user.password))
       += (form.id, form.name, form.password)).asTry
     db.run(query)

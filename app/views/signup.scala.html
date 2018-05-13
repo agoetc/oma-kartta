@@ -1,4 +1,4 @@
-@(userNewForm: Form[forms.UserForm.CreateForm])(implicit request: MessagesRequestHeader)
+@(createForm: Form[forms.UserForm.CreateForm])(implicit request: MessagesRequestHeader)
 @implicitField = @{ FieldConstructor(layout.fieldConstructor.f) }
 @import helper._
 @default("新規登録ページ", "新規登録ページ"){
@@ -11,22 +11,22 @@
 
     @form(routes.IndexController.createUser()) {
 
-        @inputText(userNewForm("id"),
+        @inputText(createForm("id"),
             'class -> "form-control",
             'placeholder -> "ユーザID",
-            'value -> userNewForm.data.getOrElse("id", ""),
+            'value -> createForm.data.getOrElse("id", ""),
         )
 
-        @inputText(userNewForm("name"),
+        @inputText(createForm("name"),
             'class -> "form-control",
             'placeholder -> "ユーザ名",
-            'value -> userNewForm.data.getOrElse("name", ""),
+            'value -> createForm.data.getOrElse("name", ""),
         )
 
-        @inputPassword(userNewForm("password"),
+        @inputPassword(createForm("password"),
             'class -> "form-control",
             'placeholder -> "パスワード",
-            'value -> userNewForm.data.getOrElse("password", ""),
+            'value -> createForm.data.getOrElse("password", ""),
         )
 
         <button type="submit" class="btn btn-primary">送信</button>

@@ -6,6 +6,7 @@ import play.api.mvc._
 import play.api.data._
 import play.api.data.Forms._
 import models._
+import play.api.data.validation.Constraints
 import utils.AuthenticatedAction
 
 import scala.concurrent.Future
@@ -14,13 +15,20 @@ import scala.language.postfixOps
 import scala.util.{Failure, Success}
 
 @Singleton
-class IndexController @Inject()(cc: ControllerComponents ,authenticatedAction: AuthenticatedAction) extends AbstractController(cc) {
+class IndexController @Inject()(
+                                 cc: ControllerComponents,
+                                 authenticatedAction: AuthenticatedAction,
+                                 messagesAction: MessagesActionBuilder,
+                               ) extends AbstractController(cc) {
 
   val newForm = Form(
     mapping(
-      "id" -> nonEmptyText,
-      "name" -> nonEmptyText,
-      "password" ->nonEmptyText
+      "id" -> nonEmptyText(minLength = 4,maxLength = 20)
+                                .verifying(
+                                  Constraints.pattern("\\w*".r,
+                                  error = "形式が不正です。記号は _ が使用できます")),
+      "name" -> nonEmptyText(maxLength = 20),
+      "password" ->nonEmptyText(minLength = 6,maxLength = 20)
     )(UserDao.UserNewForm.apply)(UserDao.UserNewForm.unapply)
   )
 
@@ -49,7 +57,7 @@ class IndexController @Inject()(cc: ControllerComponents ,authenticatedAction: A
     Ok(views.html.signin())
   }
 
-  def signup = Action {
+  def signup = messagesAction { implicit request: MessagesRequest[AnyContent] =>
     Ok(views.html.signup(newForm))
   }
 
@@ -60,15 +68,15 @@ class IndexController @Inject()(cc: ControllerComponents ,authenticatedAction: A
     )
   }
 
-  def createUser = Action.async { implicit request =>
+  def createUser = messagesAction.async { implicit request: MessagesRequest[AnyContent] =>
     newForm.bindFromRequest().fold(
-      errors => Future(BadRequest(views.html.signup(errors))),
-      form => {
+      errors =>
+        Future(BadRequest(views.html.signup(errors))),
+      form =>
           UserDao.createUser(form).flatMap {
-            case Failure(e) => Future(Redirect("/signup"))
-            case Success(_)  => this.auth (form.id, form.password)
+            case Failure(e) => Future(Redirect("/signup").flashing("errorMessage" -> "エラーが発生しました。お手数ですがもう一度入力してください"))
+            case Success(_) => this.auth(form.id, form.password)
           }
-      }
     )
   }
 

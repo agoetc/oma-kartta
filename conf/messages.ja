@@ -1,0 +1,11 @@
+# --- Errors
+error.invalid=不正な値
+error.required=入力してください
+error.number=数値でなければいけません
+error.min={0}より大きくなければいけません
+error.max={0}より小さくなければいけません
+error.minLength={0}文字より長くなければいけません
+error.maxLength={0}文字より短くなければいけません
+error.email=妥当なメールアドレスではありません
+error.pattern={0}を満たしている必要があります
+error.password.unmatch=パスワードが一致していません

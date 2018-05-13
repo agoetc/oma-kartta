@@ -1,0 +1,8 @@
+@(elements: helper.FieldElements)
+<div class="form-group">
+    @println(List(elements.errors))
+    @if(elements.hasErrors) {
+        <span class="text-danger errors">@elements.errors.last</span>
+    }
+    @elements.input
+</div>

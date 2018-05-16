@@ -15,6 +15,7 @@ libraryDependencies ++= Seq(
   "mysql" % "mysql-connector-java" % "6.0.5",
   "com.typesafe.slick" %% "slick" % "3.2.1",
   "com.typesafe.slick" %% "slick-codegen" % "3.2.1",
+  "com.typesafe.play" %% "play-slick-evolutions" % "3.0.3",
   "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.9.2",
   "com.koddi" %% "geocoder" % "1.1.0"
 )

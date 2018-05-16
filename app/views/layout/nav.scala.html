@@ -1,28 +1,34 @@
 @()
-<ul class="nav nav-tabs">
-    <li class="nav-item">
-        <a class="nav-link" href="/main">OmaKartta</a>
-    </li>
-    <li class="nav-item dropdown mr-auto">
-        <a class="nav-link dropdown-toggle" data-toggle="dropdown"
-        href="#!" role="button" aria-haspopup="true" aria-expanded="false">
-            メニュー</a>
-        <div class="dropdown-menu">
-            <a class="dropdown-item" href="/user">ユーザー検索</a>
-            <a class="dropdown-item" href="/paikka/add">パイッカ登録</a>
-        </div>
-    </li>
-    <li class="nav-item">
-        <div class="dropdown">
-            <button class="btn btn-secondary dropdown-toggle"
-            type="button" id="dropdownMenu1" data-toggle="dropdown"
-            aria-haspopup="true" aria-expanded="false">
-                設定
-            </button>
-            <div class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                <a class="dropdown-item" href="/mypage">マイページ</a>
-                <a class="dropdown-item" href="/signout">サインアウト</a>
-            </div>
-        </div>
-    </li>
-</ul>
+<nav class="navbar navbar-expand-md navbar-dark fixed-top" style="background-color: #FDB247;">
+    <a class="navbar-brand" href="/main">OmaKartta</a>
+    <button class="navbar-toggler collapsed" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="navbar-collapse collapse" id="navbarsExampleDefault" style="">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="/main">Home <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item dropdown active">
+                <a class="nav-link dropdown-toggle" data-toggle="dropdown"
+                href="#!" role="button" aria-haspopup="true" aria-expanded="false">
+                    メニュー</a>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="/user">ユーザー検索</a>
+                    <a class="dropdown-item" href="/paikka/add">パイッカ登録</a>
+                </div>
+            </li>
+        </ul>
+
+        <ul class="navbar-nav">
+            <li class="nav-item dropdown active">
+                <a class="nav-link dropdown-toggle" data-toggle="dropdown"
+                href="#!" role="button" aria-haspopup="true" aria-expanded="false">設定</a>
+                <div class="dropdown-menu dropdown-menu-right">
+                    <a class="dropdown-item" href="/mypage">マイページ</a>
+                    <a class="dropdown-item" href="/signout">サインアウト</a>
+                </div>
+            </li>
+        </ul>
+    </div>
+</nav>

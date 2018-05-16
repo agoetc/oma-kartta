@@ -1,7 +1,7 @@
 @(createForm: Form[forms.UserForm.CreateForm])(implicit request: MessagesRequestHeader)
 @implicitField = @{ FieldConstructor(layout.fieldConstructor.f) }
 @import helper._
-@default("新規登録ページ", "新規登録ページ"){
+@default("新規登録ページ", "新規登録"){
 
     @if(request.flash.get("errorMessage")) {
         <div class="alert alert-danger" role="alert">

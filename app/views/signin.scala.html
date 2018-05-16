@@ -1,7 +1,7 @@
 @(signinForm: Form[forms.UserForm.SigninForm])(implicit request: MessagesRequestHeader)
 @implicitField = @{ FieldConstructor(layout.fieldConstructor.f) }
 @import helper._
-@default("サインインページ", "サインインページ"){
+@default("サインインページ", "サインイン"){
   <!--サインイン処理-->
     @if(request.flash.get("errorMessage")) {
         <div class="alert alert-danger" role="alert">

@@ -18,7 +18,7 @@ import models._
 import utils.AuthenticatedAction
 
 @Singleton
-class RestaurantController @Inject()(cc: ControllerComponents, authenticatedAction: AuthenticatedAction) extends AbstractController(cc){
+class PaikkaController @Inject()(cc: ControllerComponents, authenticatedAction: AuthenticatedAction) extends AbstractController(cc){
 
   case class MapContent(content: String)
 
@@ -36,7 +36,7 @@ class RestaurantController @Inject()(cc: ControllerComponents, authenticatedActi
       "text" -> optional(text),
       "postal_code" -> nonEmptyText,
       "address" -> nonEmptyText
-    )(RestaurantDao.RestaurantNewForm.apply)(RestaurantDao.RestaurantNewForm.unapply)
+    )(PaikkaDao.PaikkaNewForm.apply)(PaikkaDao.PaikkaNewForm.unapply)
   )
 
 
@@ -47,28 +47,28 @@ class RestaurantController @Inject()(cc: ControllerComponents, authenticatedActi
     )(KartallaDao.CreateKartalla.apply)(KartallaDao.CreateKartalla.unapply)
   )
 
-  case class FollowKartalla(userId: String, star: Int, sana: String, restaurantId: Int, createdAt: Date, lat: Double, lng: Double)
-  case class Restaurant(id: Int, name: String, kana: String, text: Option[String] = None, postalCode: String, address: String)
+  case class FollowKartalla(userId: String, star: Int, sana: String, paikkaId: Int, createdAt: Date, lat: Double, lng: Double)
+  case class Paikka(id: Int, name: String, kana: String, text: Option[String] = None, postalCode: String, address: String)
 
 
-  def restaurantDetail(id:Int) = authenticatedAction.async { implicit request =>
+  def paikkaDetail(id:Int) = authenticatedAction.async { implicit request =>
     val userId = request.session.get("user_id").getOrElse("")
-    val restaurant = RestaurantDao.getById(id)
-    val kartalla = KartallaDao.getByUserIdAndRestaurantId(userId,id)
+    val paikka = PaikkaDao.getById(id)
+    val kartalla = KartallaDao.getByUserIdAndPaikkaId(userId,id)
 
     for {
-      restaurant <- restaurant
+      paikka <- paikka
       kartalla <- kartalla
     } yield {
-      restaurant match {
+      paikka match {
         case Nil => BadRequest(views.html.error.error("404", "ページが見つかりませんでした"))
-        case _ => Ok(views.html.restaurant.restaurant(restaurant.head))
+        case _ => Ok(views.html.paikka.paikka(paikka.head))
       }
     }
   }
 
   def addMap() = authenticatedAction {
-    Ok(views.html.restaurant.restaurantadd())
+    Ok(views.html.paikka.paikkaadd())
   }
 
 
@@ -78,21 +78,21 @@ class RestaurantController @Inject()(cc: ControllerComponents, authenticatedActi
       form => {   // geocoderでもらった、郵便番号と住所を取得する
         val postal_code = form.content.split(' ').apply(0).takeRight(8)
         val address = form.content.split(' ').apply(1)
-        Ok(views.html.restaurant.restaurantaddform(postal_code, address))
+        Ok(views.html.paikka.paikkaaddform(postal_code, address))
       }
     )
   }
 
 
-  def createRestaurant = authenticatedAction.async { implicit request =>
+  def createPaikka = authenticatedAction.async { implicit request =>
     newForm.bindFromRequest.fold(
       errors =>{
         Future(BadRequest(views.html.error.error("500", "内部エラー")))
       },
       form => {
-        // insertしたrestaurantのid取得
-        RestaurantDao.createRestaurant(form).map { id =>
-          Redirect(s"/restaurant/detail/${id}")
+        // insertしたpaikkaのid取得
+        PaikkaDao.createPaikka(form).map { id =>
+          Redirect(s"/paikka/detail/${id}")
         }
       }
     )
@@ -101,14 +101,14 @@ class RestaurantController @Inject()(cc: ControllerComponents, authenticatedActi
   def addKartalla(id: Int) = authenticatedAction { implicit request =>
     createKartallaForm.bindFromRequest.fold(
       errors =>
-        Redirect(s"/restaurant/detail/${id}").flashing("errorMessage" -> "エラーが発生しました"),
+        Redirect(s"/paikka/detail/${id}").flashing("errorMessage" -> "エラーが発生しました"),
       form => {
         //　サインインしていればカルタラ作成
         request.session.get("user_id") match {
           case Some(user_id) => KartallaDao.createKartalla(form, id, user_id)
           case None => Redirect("/")
         }
-        Redirect(s"/restaurant/detail/${id}").flashing("message" -> "カルタラを登録しました")
+        Redirect(s"/paikka/detail/${id}").flashing("message" -> "カルタラを登録しました")
       }
     )
   }
@@ -129,15 +129,15 @@ class RestaurantController @Inject()(cc: ControllerComponents, authenticatedActi
     }
   }
 
-  def getRestaurant(id: Int) = Action.async { implicit request =>
-    val results = RestaurantDao.getById(id)
-    results.map { restaurants =>
-      restaurants match {
+  def getPaikka(id: Int) = Action.async { implicit request =>
+    val results = PaikkaDao.getById(id)
+    results.map { paikkas =>
+      paikkas match {
         case nonEmpty =>
-          val restaurant = restaurants.head
-          val sendRestaurant = Restaurant(restaurant.id, restaurant.name, restaurant.kana, restaurant.text, restaurant.postalCode, restaurant.address)
-          implicit val restaurantFormat = Json.format[Restaurant]
-          Ok(Json.toJson(sendRestaurant))
+          val paikka = paikkas.head
+          val sendPaikka = Paikka(paikka.id, paikka.name, paikka.kana, paikka.text, paikka.postalCode, paikka.address)
+          implicit val paikkaFormat = Json.format[Paikka]
+          Ok(Json.toJson(sendPaikka))
         case _ =>  BadRequest(views.html.error.error("500", "内部エラーが発生しました"))
       }
     }

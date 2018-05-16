@@ -1,7 +1,7 @@
-# restaurants schema
+# paikka schema
 
 # --- !Ups
-CREATE TABLE restaurants (
+CREATE TABLE paikka (
   id INT AUTO_INCREMENT NOT NULL PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
   kana VARCHAR(255) NOT NULL,
@@ -11,4 +11,4 @@ CREATE TABLE restaurants (
 );
 
 # --- !Downs
-drop table restaurants
+drop table paikka

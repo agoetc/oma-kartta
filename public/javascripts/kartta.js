@@ -39,9 +39,9 @@ function setMarker(map,kartallaJson) {
          */
         marker[i].addListener('click', function () {
             $.getJSON(
-                "/getrestaurant/" + kartallaJson[i]['restaurantId'],
-                function (restaurantJson, status) {
-                    infoWindow.setContent(createContent(restaurantJson, kartallaJson[i]));
+                "/getpaikka/" + kartallaJson[i]['paikkaId'],
+                function (paikkaJson, status) {
+                    infoWindow.setContent(createContent(paikkaJson, kartallaJson[i]));
                     map.panTo(marker[i]['position']);
                     infoWindow.open(map, marker[i]); // 吹き出しの表示
                 });
@@ -50,17 +50,17 @@ function setMarker(map,kartallaJson) {
     }
 }
 
-function createContent(restaurantJson, kartallaJson) {
+function createContent(paikkaJson, kartallaJson) {
     return '' +
         '<table class="table">' +
         '<thead>' +
-        '   <tr><h4><a href="/restaurant/detail/' + restaurantJson.id + '">' +
-        restaurantJson.name + '</a></h4></tr>' +
+        '   <tr><h4><a href="/paikka/detail/' + paikkaJson.id + '">' +
+        paikkaJson.name + '</a></h4></tr>' +
         '</thead>' +
         '  <tbody>' +
         '    <tr>' +
         '      <td>詳細</td>' +
-        '      <td>' + restaurantJson.text + '</td>' +
+        '      <td>' + paikkaJson.text + '</td>' +
         '    </tr>' +
         '    <tr>' +
         '      <td>サナ</td>' +

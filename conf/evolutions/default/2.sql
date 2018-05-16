@@ -3,7 +3,7 @@
 # --- !Ups
 CREATE TABLE kartalla (
   id INT AUTO_INCREMENT NOT NULL PRIMARY KEY,
-  restaurant_id INT NOT NULL,
+  paikka_id INT NOT NULL,
   user_id VARCHAR(255) NOT NULL,
   star int(2) NOT NULL,
   sana VARCHAR(255) NOT NULL ,

@@ -47,7 +47,7 @@ class UserController @Inject()(cc: ControllerComponents, authenticatedAction: Au
   def index(username: Option[String], userID: Option[String]) = authenticatedAction.async {
     val users = UserDao.searchUser(username.getOrElse(""), userID.getOrElse(""))
     users.map(user =>
-      Ok(views.html.restaurant.userlist(user))
+      Ok(views.html.paikka.userlist(user))
     )
   }
 }

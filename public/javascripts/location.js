@@ -36,7 +36,7 @@ function initMap(){
                 pushpos = marker.position;
                 geocoder.geocode( {latLng: pushpos}, function(results, status){
                 results = results[0].formatted_address;
-                var dom = '<form action="/restaurant/new" method="post">' +
+                var dom = '<form action="/paikka/new" method="post">' +
                     '<button type="submit" name="content" value="'+results+'">ここを登録する</button>' +
                     '</form>';
                 infoWindow.setOptions({content: dom});

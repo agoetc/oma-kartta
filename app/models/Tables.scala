@@ -14,11 +14,11 @@ trait Tables {
   import slick.jdbc.{GetResult => GR}
 
   /** DDL for all tables. Call .create to execute. */
-  lazy val schema: profile.SchemaDescription = Karttana.schema ++ Relation.schema ++ Restaurants.schema ++ UserReviews.schema ++ Users.schema
+  lazy val schema: profile.SchemaDescription = Array(Kartalla.schema, PlayEvolutions.schema, Relation.schema, Restaurants.schema, UserReviews.schema, Users.schema).reduceLeft(_ ++ _)
   @deprecated("Use .schema instead of .ddl", "3.0")
   def ddl = schema
 
-  /** Entity class storing rows of table Karttana
+  /** Entity class storing rows of table Kartalla
    *  @param id Database column id SqlType(INT), AutoInc, PrimaryKey
    *  @param restaurantId Database column restaurant_id SqlType(INT)
    *  @param userId Database column user_id SqlType(VARCHAR), Length(255,true)
@@ -26,17 +26,17 @@ trait Tables {
    *  @param sana Database column sana SqlType(VARCHAR), Length(255,true)
    *  @param createdAt Database column created_at SqlType(TIMESTAMP)
    *  @param updatedAt Database column updated_at SqlType(TIMESTAMP) */
-  case class KarttanaRow(id: Int, restaurantId: Int, userId: String, star: Int, sana: String, createdAt: java.sql.Timestamp, updatedAt: java.sql.Timestamp)
-  /** GetResult implicit for fetching KarttanaRow objects using plain SQL queries */
-  implicit def GetResultKarttanaRow(implicit e0: GR[Int], e1: GR[String], e2: GR[java.sql.Timestamp]): GR[KarttanaRow] = GR{
+  case class KartallaRow(id: Int, restaurantId: Int, userId: String, star: Int, sana: String, createdAt: java.sql.Timestamp, updatedAt: java.sql.Timestamp)
+  /** GetResult implicit for fetching KartallaRow objects using plain SQL queries */
+  implicit def GetResultKartallaRow(implicit e0: GR[Int], e1: GR[String], e2: GR[java.sql.Timestamp]): GR[KartallaRow] = GR{
     prs => import prs._
-    KarttanaRow.tupled((<<[Int], <<[Int], <<[String], <<[Int], <<[String], <<[java.sql.Timestamp], <<[java.sql.Timestamp]))
+    KartallaRow.tupled((<<[Int], <<[Int], <<[String], <<[Int], <<[String], <<[java.sql.Timestamp], <<[java.sql.Timestamp]))
   }
-  /** Table description of table karttana. Objects of this class serve as prototypes for rows in queries. */
-  class Karttana(_tableTag: Tag) extends profile.api.Table[KarttanaRow](_tableTag, Some("omakartta"), "karttana") {
-    def * = (id, restaurantId, userId, star, sana, createdAt, updatedAt) <> (KarttanaRow.tupled, KarttanaRow.unapply)
+  /** Table description of table kartalla. Objects of this class serve as prototypes for rows in queries. */
+  class Kartalla(_tableTag: Tag) extends profile.api.Table[KartallaRow](_tableTag, Some("omakartta"), "kartalla") {
+    def * = (id, restaurantId, userId, star, sana, createdAt, updatedAt) <> (KartallaRow.tupled, KartallaRow.unapply)
     /** Maps whole row to an option. Useful for outer joins. */
-    def ? = (Rep.Some(id), Rep.Some(restaurantId), Rep.Some(userId), Rep.Some(star), Rep.Some(sana), Rep.Some(createdAt), Rep.Some(updatedAt)).shaped.<>({r=>import r._; _1.map(_=> KarttanaRow.tupled((_1.get, _2.get, _3.get, _4.get, _5.get, _6.get, _7.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
+    def ? = (Rep.Some(id), Rep.Some(restaurantId), Rep.Some(userId), Rep.Some(star), Rep.Some(sana), Rep.Some(createdAt), Rep.Some(updatedAt)).shaped.<>({r=>import r._; _1.map(_=> KartallaRow.tupled((_1.get, _2.get, _3.get, _4.get, _5.get, _6.get, _7.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
 
     /** Database column id SqlType(INT), AutoInc, PrimaryKey */
     val id: Rep[Int] = column[Int]("id", O.AutoInc, O.PrimaryKey)
@@ -53,8 +53,46 @@ trait Tables {
     /** Database column updated_at SqlType(TIMESTAMP) */
     val updatedAt: Rep[java.sql.Timestamp] = column[java.sql.Timestamp]("updated_at")
   }
-  /** Collection-like TableQuery object for table Karttana */
-  lazy val Karttana = new TableQuery(tag => new Karttana(tag))
+  /** Collection-like TableQuery object for table Kartalla */
+  lazy val Kartalla = new TableQuery(tag => new Kartalla(tag))
+
+  /** Entity class storing rows of table PlayEvolutions
+   *  @param id Database column id SqlType(INT), PrimaryKey
+   *  @param hash Database column hash SqlType(VARCHAR), Length(255,true)
+   *  @param appliedAt Database column applied_at SqlType(TIMESTAMP)
+   *  @param applyScript Database column apply_script SqlType(MEDIUMTEXT), Length(16777215,true), Default(None)
+   *  @param revertScript Database column revert_script SqlType(MEDIUMTEXT), Length(16777215,true), Default(None)
+   *  @param state Database column state SqlType(VARCHAR), Length(255,true), Default(None)
+   *  @param lastProblem Database column last_problem SqlType(MEDIUMTEXT), Length(16777215,true), Default(None) */
+  case class PlayEvolutionsRow(id: Int, hash: String, appliedAt: java.sql.Timestamp, applyScript: Option[String] = None, revertScript: Option[String] = None, state: Option[String] = None, lastProblem: Option[String] = None)
+  /** GetResult implicit for fetching PlayEvolutionsRow objects using plain SQL queries */
+  implicit def GetResultPlayEvolutionsRow(implicit e0: GR[Int], e1: GR[String], e2: GR[java.sql.Timestamp], e3: GR[Option[String]]): GR[PlayEvolutionsRow] = GR{
+    prs => import prs._
+    PlayEvolutionsRow.tupled((<<[Int], <<[String], <<[java.sql.Timestamp], <<?[String], <<?[String], <<?[String], <<?[String]))
+  }
+  /** Table description of table play_evolutions. Objects of this class serve as prototypes for rows in queries. */
+  class PlayEvolutions(_tableTag: Tag) extends profile.api.Table[PlayEvolutionsRow](_tableTag, Some("omakartta"), "play_evolutions") {
+    def * = (id, hash, appliedAt, applyScript, revertScript, state, lastProblem) <> (PlayEvolutionsRow.tupled, PlayEvolutionsRow.unapply)
+    /** Maps whole row to an option. Useful for outer joins. */
+    def ? = (Rep.Some(id), Rep.Some(hash), Rep.Some(appliedAt), applyScript, revertScript, state, lastProblem).shaped.<>({r=>import r._; _1.map(_=> PlayEvolutionsRow.tupled((_1.get, _2.get, _3.get, _4, _5, _6, _7)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
+
+    /** Database column id SqlType(INT), PrimaryKey */
+    val id: Rep[Int] = column[Int]("id", O.PrimaryKey)
+    /** Database column hash SqlType(VARCHAR), Length(255,true) */
+    val hash: Rep[String] = column[String]("hash", O.Length(255,varying=true))
+    /** Database column applied_at SqlType(TIMESTAMP) */
+    val appliedAt: Rep[java.sql.Timestamp] = column[java.sql.Timestamp]("applied_at")
+    /** Database column apply_script SqlType(MEDIUMTEXT), Length(16777215,true), Default(None) */
+    val applyScript: Rep[Option[String]] = column[Option[String]]("apply_script", O.Length(16777215,varying=true), O.Default(None))
+    /** Database column revert_script SqlType(MEDIUMTEXT), Length(16777215,true), Default(None) */
+    val revertScript: Rep[Option[String]] = column[Option[String]]("revert_script", O.Length(16777215,varying=true), O.Default(None))
+    /** Database column state SqlType(VARCHAR), Length(255,true), Default(None) */
+    val state: Rep[Option[String]] = column[Option[String]]("state", O.Length(255,varying=true), O.Default(None))
+    /** Database column last_problem SqlType(MEDIUMTEXT), Length(16777215,true), Default(None) */
+    val lastProblem: Rep[Option[String]] = column[Option[String]]("last_problem", O.Length(16777215,varying=true), O.Default(None))
+  }
+  /** Collection-like TableQuery object for table PlayEvolutions */
+  lazy val PlayEvolutions = new TableQuery(tag => new PlayEvolutions(tag))
 
   /** Entity class storing rows of table Relation
    *  @param id Database column id SqlType(INT), AutoInc, PrimaryKey

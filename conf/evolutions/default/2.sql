@@ -1,7 +1,7 @@
-# karttana schema
+# kartalla schema
 
 # --- !Ups
-CREATE TABLE karttana (
+CREATE TABLE kartalla (
   id INT AUTO_INCREMENT NOT NULL PRIMARY KEY,
   restaurant_id INT NOT NULL,
   user_id VARCHAR(255) NOT NULL,
@@ -12,4 +12,4 @@ CREATE TABLE karttana (
 );
 
 # --- !Downs
-drop table karttana
+drop table kartalla

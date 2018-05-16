@@ -2,7 +2,7 @@
 function initMap() {
     if (navigator.geolocation) {
         $.getJSON(
-            "/getkarttana", //リクエストURL
+            "/getkartalla", //リクエストURL
             function (json, status) {
                 initialize(json);
             });
@@ -23,13 +23,13 @@ function initialize(json) {
 }
 
 
-function setMarker(map,karttanaJson) {
+function setMarker(map,kartallaJson) {
     let marker = [];
     var infoWindow = new google.maps.InfoWindow({});
 
-    for (let i in karttanaJson) {
+    for (let i in kartallaJson) {
         marker[i] = new google.maps.Marker({ // マーカーの追加
-            position: new google.maps.Marker({lat: karttanaJson[i].lat, lng: karttanaJson[i].lng}), // マーカーを立てる位置を指定
+            position: new google.maps.Marker({lat: kartallaJson[i].lat, lng: kartallaJson[i].lng}), // マーカーを立てる位置を指定
             map: map // マーカーを立てる地図を指定
         });
 
@@ -39,9 +39,9 @@ function setMarker(map,karttanaJson) {
          */
         marker[i].addListener('click', function () {
             $.getJSON(
-                "/getrestaurant/" + karttanaJson[i]['restaurantId'],
+                "/getrestaurant/" + kartallaJson[i]['restaurantId'],
                 function (restaurantJson, status) {
-                    infoWindow.setContent(createContent(restaurantJson, karttanaJson[i]));
+                    infoWindow.setContent(createContent(restaurantJson, kartallaJson[i]));
                     map.panTo(marker[i]['position']);
                     infoWindow.open(map, marker[i]); // 吹き出しの表示
                 });
@@ -50,7 +50,7 @@ function setMarker(map,karttanaJson) {
     }
 }
 
-function createContent(restaurantJson, karttanaJson) {
+function createContent(restaurantJson, kartallaJson) {
     return '' +
         '<table class="table">' +
         '<thead>' +
@@ -64,7 +64,7 @@ function createContent(restaurantJson, karttanaJson) {
         '    </tr>' +
         '    <tr>' +
         '      <td>サナ</td>' +
-        '      <td>' + karttanaJson.sana + '</td>' +
+        '      <td>' + kartallaJson.sana + '</td>' +
         '    </tr>' +
         '  </tbody>' +
         '</table>';

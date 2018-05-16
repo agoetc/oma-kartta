@@ -40,25 +40,25 @@ class RestaurantController @Inject()(cc: ControllerComponents, authenticatedActi
   )
 
 
-  val createKarttanaForm = Form(
+  val createKartallaForm = Form(
     mapping(
       "star" -> number,
       "sana" -> nonEmptyText
-    )(KarttanaDao.CreateKarttana.apply)(KarttanaDao.CreateKarttana.unapply)
+    )(KartallaDao.CreateKartalla.apply)(KartallaDao.CreateKartalla.unapply)
   )
 
-  case class FollowKarttana(userId: String, star: Int, sana: String, restaurantId: Int, createdAt: Date, lat: Double, lng: Double)
+  case class FollowKartalla(userId: String, star: Int, sana: String, restaurantId: Int, createdAt: Date, lat: Double, lng: Double)
   case class Restaurant(id: Int, name: String, kana: String, text: Option[String] = None, postalCode: String, address: String)
 
 
   def restaurantDetail(id:Int) = authenticatedAction.async { implicit request =>
     val userId = request.session.get("user_id").getOrElse("")
     val restaurant = RestaurantDao.getById(id)
-    val karttana = KarttanaDao.getByUserIdAndRestaurantId(userId,id)
+    val kartalla = KartallaDao.getByUserIdAndRestaurantId(userId,id)
 
     for {
       restaurant <- restaurant
-      karttana <- karttana
+      kartalla <- kartalla
     } yield {
       restaurant match {
         case Nil => BadRequest(views.html.error.error("404", "ページが見つかりませんでした"))
@@ -98,33 +98,34 @@ class RestaurantController @Inject()(cc: ControllerComponents, authenticatedActi
     )
   }
 
-  def addKarttana(id: Int) = authenticatedAction { implicit request =>
-    createKarttanaForm.bindFromRequest.fold(
+  def addKartalla(id: Int) = authenticatedAction { implicit request =>
+    createKartallaForm.bindFromRequest.fold(
       errors =>
         Redirect(s"/restaurant/detail/${id}").flashing("errorMessage" -> "エラーが発生しました"),
       form => {
-        //　サインインしていればカルタナ作成
+        //　サインインしていればカルタラ作成
         request.session.get("user_id") match {
-          case Some(user_id) => KarttanaDao.createKarttana(form, id, user_id)
+          case Some(user_id) => KartallaDao.createKartalla(form, id, user_id)
           case None => Redirect("/")
         }
-        Redirect(s"/restaurant/detail/${id}").flashing("message" -> "カルタナを登録しました")
+        Redirect(s"/restaurant/detail/${id}").flashing("message" -> "カルタラを登録しました")
       }
     )
   }
 
-  def getKarttana =  Action.async { implicit request =>
+  def getKartalla =  Action.async { implicit request =>
     val user_id = request.session.get("user_id").getOrElse("")
-    // フォローしているユーザーのカルタナを取得
-    val results = KarttanaDao.getFollowKarttana(user_id)
-    results.map { karttana =>
+    // フォローしているユーザーのカルタラを取得
+    val results = KartallaDao.getFollowKartalla(user_id)
+    results.map { kartalla =>
       val geo = Geocoder.create(ConfigFactory.load().getString("apiKey"))
-      val followKarttana : Seq[FollowKarttana] = for(karttana <- karttana) yield {
-        val location = geo.lookup(karttana._6).head.geometry.location
-        FollowKarttana(karttana._1, karttana._2, karttana._3, karttana._4, karttana._5, location.latitude, location.longitude)
+      val followKartalla : Seq[FollowKartalla] = for(kartalla <- kartalla) yield {
+        geo.lookup(kartalla._6).head.geometry.location
+        val location = geo.lookup(kartalla._6).head.geometry.location
+        FollowKartalla(kartalla._1, kartalla._2, kartalla._3, kartalla._4, kartalla._5, location.latitude, location.longitude)
       }
-      implicit val followKarttanaFormat = Json.format[FollowKarttana]
-      Ok(Json.toJson(followKarttana))
+      implicit val followKartallaFormat = Json.format[FollowKartalla]
+      Ok(Json.toJson(followKartalla))
     }
   }
 

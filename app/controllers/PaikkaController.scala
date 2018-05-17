@@ -58,7 +58,7 @@ class PaikkaController @Inject()(cc: ControllerComponents, authenticatedAction: 
       form => {
         // insertしたpaikkaのid取得
         PaikkaDao.createPaikka(form).map { id =>
-          Redirect(s"/paikka/detail/${id}")
+          Redirect(s"/paikka/${id}")
         }
       }
     )
@@ -67,14 +67,14 @@ class PaikkaController @Inject()(cc: ControllerComponents, authenticatedAction: 
   def addKartalla(id: Int) = authenticatedAction { implicit request =>
     createKartallaForm.bindFromRequest.fold(
       errors =>
-        Redirect(s"/paikka/detail/${id}").flashing("errorMessage" -> "エラーが発生しました"),
+        Redirect(s"/paikka/${id}").flashing("errorMessage" -> "エラーが発生しました"),
       form => {
         //　サインインしていればカルタラ作成
         request.session.get("user_id") match {
           case Some(user_id) => KartallaDao.createKartalla(form, id, user_id)
           case None => Redirect("/")
         }
-        Redirect(s"/paikka/detail/${id}").flashing("message" -> "カルタラを登録しました")
+        Redirect(s"/paikka/${id}").flashing("message" -> "カルタラを登録しました")
       }
     )
   }

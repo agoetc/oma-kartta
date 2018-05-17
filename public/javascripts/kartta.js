@@ -54,7 +54,7 @@ function createContent(paikkaJson, kartallaJson) {
     return '' +
         '<table class="table">' +
         '<thead>' +
-        '   <tr><h4><a href="/paikka/detail/' + paikkaJson.id + '">' +
+        '   <tr><h4><a href="/paikka/' + paikkaJson.id + '">' +
         paikkaJson.name + '</a></h4></tr>' +
         '</thead>' +
         '  <tbody>' +

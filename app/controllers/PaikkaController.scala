@@ -53,6 +53,7 @@ class PaikkaController @Inject()(cc: ControllerComponents, authenticatedAction: 
   def createPaikka = authenticatedAction.async { implicit request =>
     newForm.bindFromRequest.fold(
       errors =>{
+        println(errors)
         Future(BadRequest(views.html.error.error("500", "内部エラー")))
       },
       form => {
@@ -101,7 +102,7 @@ class PaikkaController @Inject()(cc: ControllerComponents, authenticatedAction: 
       paikkas match {
         case nonEmpty =>
           val paikka = paikkas.head
-          val sendPaikka = Paikka(paikka.id, paikka.name, paikka.kana, paikka.text, paikka.postalCode, paikka.address)
+          val sendPaikka = Paikka(paikka.id, paikka.name, paikka.kana, paikka.tag, paikka.text, paikka.postalCode, paikka.address)
           implicit val paikkaFormat = Json.format[Paikka]
           Ok(Json.toJson(sendPaikka))
         case _ =>  BadRequest(views.html.error.error("500", "内部エラーが発生しました"))

@@ -60,20 +60,21 @@ trait Tables {
    *  @param id Database column id SqlType(INT), AutoInc, PrimaryKey
    *  @param name Database column name SqlType(VARCHAR), Length(255,true)
    *  @param kana Database column kana SqlType(VARCHAR), Length(255,true)
+   *  @param tag Database column tag SqlType(VARCHAR), Length(20,true)
    *  @param text Database column text SqlType(VARCHAR), Length(255,true), Default(None)
    *  @param postalCode Database column postal_code SqlType(VARCHAR), Length(8,true)
    *  @param address Database column address SqlType(VARCHAR), Length(255,true) */
-  case class PaikkaRow(id: Int, name: String, kana: String, text: Option[String] = None, postalCode: String, address: String)
+  case class PaikkaRow(id: Int, name: String, kana: String, tag: String, text: Option[String] = None, postalCode: String, address: String)
   /** GetResult implicit for fetching PaikkaRow objects using plain SQL queries */
   implicit def GetResultPaikkaRow(implicit e0: GR[Int], e1: GR[String], e2: GR[Option[String]]): GR[PaikkaRow] = GR{
     prs => import prs._
-    PaikkaRow.tupled((<<[Int], <<[String], <<[String], <<?[String], <<[String], <<[String]))
+    PaikkaRow.tupled((<<[Int], <<[String], <<[String], <<[String], <<?[String], <<[String], <<[String]))
   }
   /** Table description of table paikka. Objects of this class serve as prototypes for rows in queries. */
   class Paikka(_tableTag: Tag) extends profile.api.Table[PaikkaRow](_tableTag, Some("omakartta"), "paikka") {
-    def * = (id, name, kana, text, postalCode, address) <> (PaikkaRow.tupled, PaikkaRow.unapply)
+    def * = (id, name, kana, tag, text, postalCode, address) <> (PaikkaRow.tupled, PaikkaRow.unapply)
     /** Maps whole row to an option. Useful for outer joins. */
-    def ? = (Rep.Some(id), Rep.Some(name), Rep.Some(kana), text, Rep.Some(postalCode), Rep.Some(address)).shaped.<>({r=>import r._; _1.map(_=> PaikkaRow.tupled((_1.get, _2.get, _3.get, _4, _5.get, _6.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
+    def ? = (Rep.Some(id), Rep.Some(name), Rep.Some(kana), Rep.Some(tag), text, Rep.Some(postalCode), Rep.Some(address)).shaped.<>({r=>import r._; _1.map(_=> PaikkaRow.tupled((_1.get, _2.get, _3.get, _4.get, _5, _6.get, _7.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
 
     /** Database column id SqlType(INT), AutoInc, PrimaryKey */
     val id: Rep[Int] = column[Int]("id", O.AutoInc, O.PrimaryKey)
@@ -81,6 +82,8 @@ trait Tables {
     val name: Rep[String] = column[String]("name", O.Length(255,varying=true))
     /** Database column kana SqlType(VARCHAR), Length(255,true) */
     val kana: Rep[String] = column[String]("kana", O.Length(255,varying=true))
+    /** Database column tag SqlType(VARCHAR), Length(20,true) */
+    val tag: Rep[String] = column[String]("tag", O.Length(20,varying=true))
     /** Database column text SqlType(VARCHAR), Length(255,true), Default(None) */
     val text: Rep[Option[String]] = column[Option[String]]("text", O.Length(255,varying=true), O.Default(None))
     /** Database column postal_code SqlType(VARCHAR), Length(8,true) */

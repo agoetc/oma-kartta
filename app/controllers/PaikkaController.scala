@@ -2,53 +2,19 @@ package controllers
 
 import javax.inject._
 import play.api.mvc._
-import play.api.data._
-import play.api.data.Forms._
 import play.api.libs.json._
 import play.api.libs.json.Writes._
-
 import scala.concurrent._
 import ExecutionContext.Implicits.global
 import scala.language.postfixOps
-import java.util.Date
-
 import com.koddi.geocoder.Geocoder
 import com.typesafe.config.ConfigFactory
-import models._
 import utils.AuthenticatedAction
+import forms.PaikkaForm._
+import models._
 
 @Singleton
 class PaikkaController @Inject()(cc: ControllerComponents, authenticatedAction: AuthenticatedAction) extends AbstractController(cc){
-
-  case class MapContent(content: String)
-
-  val mapContent = Form(
-    mapping(
-      "content" -> nonEmptyText
-    )(MapContent.apply)(MapContent.unapply)
-  )
-
-
-  val newForm = Form(
-    mapping(
-      "name" -> nonEmptyText,
-      "kana" -> nonEmptyText,
-      "text" -> optional(text),
-      "postal_code" -> nonEmptyText,
-      "address" -> nonEmptyText
-    )(PaikkaDao.PaikkaNewForm.apply)(PaikkaDao.PaikkaNewForm.unapply)
-  )
-
-
-  val createKartallaForm = Form(
-    mapping(
-      "star" -> number,
-      "sana" -> nonEmptyText
-    )(KartallaDao.CreateKartalla.apply)(KartallaDao.CreateKartalla.unapply)
-  )
-
-  case class FollowKartalla(userId: String, star: Int, sana: String, paikkaId: Int, createdAt: Date, lat: Double, lng: Double)
-  case class Paikka(id: Int, name: String, kana: String, text: Option[String] = None, postalCode: String, address: String)
 
 
   def paikkaDetail(id:Int) = authenticatedAction.async { implicit request =>

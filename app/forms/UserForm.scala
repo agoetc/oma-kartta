@@ -7,6 +7,7 @@ import play.api.data.validation.Constraints
 object UserForm {
 
   case class CreateForm(id: String, name: String, password: String)
+  case class SigninForm(id: String, password: String)
 
   val createForm = Form(
     mapping(
@@ -19,7 +20,6 @@ object UserForm {
     )(CreateForm.apply)(CreateForm.unapply))
 
 
-  case class SigninForm(id: String, password: String)
 
   val signinForm = Form(
     mapping(

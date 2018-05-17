@@ -1,5 +1,5 @@
-@(restaurant: models.Tables.Restaurants#TableElementType)(implicit request: RequestHeader)
-@layout.default("店舗", restaurant.name){
+@(paikka: models.Tables.Paikka#TableElementType)(implicit request: RequestHeader)
+@layout.default("店舗", paikka.name){
 
     @if(request.flash.get("message")) {
         <div class="alert alert-success" role="alert">
@@ -13,9 +13,9 @@
         </div>
     }
 
-    @karttanaform(restaurant.id)
+    @kartallaform(paikka.id)
     <dev>
 
-        <p>@restaurant.text</p>
+        <p>@paikka.text</p>
     </dev>
 }

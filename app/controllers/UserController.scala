@@ -5,6 +5,7 @@ import play.api.mvc._
 import play.api.data._
 import play.api.data.Forms._
 import models.UserDao
+import utils.AuthenticatedAction
 import scala.concurrent._
 import scala.language.postfixOps
 import models.Tables._
@@ -12,30 +13,10 @@ import slick.jdbc.MySQLProfile.api._
 import ExecutionContext.Implicits.global
 
 
-class UserController @Inject()(cc: ControllerComponents) extends AbstractController(cc){
-
-  val db = Database.forConfig("mysqldb")
-
-    val newForm = Form(
-      mapping(
-        "id" -> nonEmptyText,
-        "name" -> nonEmptyText,
-        "password" ->nonEmptyText
-      )(UserDao.UserNewForm.apply)(UserDao.UserNewForm.unapply)
-    )
+class UserController @Inject()(cc: ControllerComponents, authenticatedAction: AuthenticatedAction) extends AbstractController(cc){
 
 
-  def createUser = Action{ implicit request =>
-    newForm.bindFromRequest().fold(
-      errors => BadRequest(views.html.signup()),
-      form => {
-        UserDao.createUser(form)
-        Redirect("/main")
-      }
-    )
-  }
-
-  def userDetail(id: String) = Action.async { implicit request =>
+  def userDetail(id: String) = authenticatedAction.async { implicit request =>
     val user = UserDao.getById(id)
     val authId = request.session.get("user_id").getOrElse("")
     val follow = UserDao.getFollowByUserId(id)
@@ -60,16 +41,16 @@ class UserController @Inject()(cc: ControllerComponents) extends AbstractControl
     }
   }
 
-  def mypage() = Action { implicit request =>
+  def mypage() = authenticatedAction { implicit request =>
     val authId = request.session.get("user_id").getOrElse("")
     Redirect(s"/user/${authId}")
   }
 
 
-  def index(username: Option[String], userID: Option[String]) = Action.async {
+  def index(username: Option[String], userID: Option[String]) = authenticatedAction.async {
     val users = UserDao.searchUser(username.getOrElse(""), userID.getOrElse(""))
     users.map(user =>
-      Ok(views.html.restaurant.userlist(user))
+      Ok(views.html.paikka.userlist(user))
     )
   }
 

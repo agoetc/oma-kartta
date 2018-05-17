@@ -3,20 +3,20 @@ GET     /                                   controllers.IndexController.index
 GET     /signin                             controllers.IndexController.signin
 POST    /signin                             controllers.IndexController.checkSignin
 GET     /signup                             controllers.IndexController.signup
-POST    /register                           controllers.UserController.createUser
+POST    /register                           controllers.IndexController.createUser
 GET     /signout                            controllers.IndexController.signout
 GET     /main                               controllers.IndexController.main
-GET     /getkarttana                        controllers.RestaurantController.getKarttana
-GET     /getrestaurant/:id                  controllers.RestaurantController.getRestaurant(id: Int)
+GET     /getkartalla                        controllers.PaikkaController.getKartalla
+GET     /getpaikka/:id                      controllers.PaikkaController.getPaikka(id: Int)
 
 GET	    /user/:id		                    controllers.UserController.userDetail(id: String)
 GET     /mypage                             controllers.UserController.mypage
 GET     /user                               controllers.UserController.index(username: Option[String],userID: Option[String])
-GET     /restaurant/add                     controllers.RestaurantController.addMap
-POST    /restaurant/new                     controllers.RestaurantController.contentPost
-POST    /restaurant/register                controllers.RestaurantController.createRestaurant
-GET     /restaurant/detail/:id              controllers.RestaurantController.restaurantDetail(id:Int)
-POST    /restaurant/detail/:id/karttanaAdd  controllers.RestaurantController.addKarttana(id: Int)
+GET     /paikka/add                         controllers.PaikkaController.addMap
+POST    /paikka/new                         controllers.PaikkaController.contentPost
+POST    /paikka/register                    controllers.PaikkaController.createPaikka
+GET     /paikka/:id                         controllers.PaikkaController.paikkaDetail(id:Int)
+POST    /paikka/:id/kartallaAdd             controllers.PaikkaController.addKartalla(id: Int)
 
 GET     /assets/*file                       controllers.Assets.versioned(path="/public", file: Asset)
 

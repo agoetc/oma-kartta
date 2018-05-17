@@ -2,7 +2,7 @@
 function initMap() {
     if (navigator.geolocation) {
         $.getJSON(
-            "/getkarttana", //リクエストURL
+            "/getkartalla", //リクエストURL
             function (json, status) {
                 initialize(json);
             });
@@ -23,13 +23,12 @@ function initialize(json) {
 }
 
 
-function setMarker(map,karttanaJson) {
+function setMarker(map,kartallaJson) {
     let marker = [];
-    var infoWindow = new google.maps.InfoWindow({});
 
-    for (let i in karttanaJson) {
+    for (let i in kartallaJson) {
         marker[i] = new google.maps.Marker({ // マーカーの追加
-            position: new google.maps.Marker({lat: karttanaJson[i].lat, lng: karttanaJson[i].lng}), // マーカーを立てる位置を指定
+            position: new google.maps.Marker({lat: kartallaJson[i].lat, lng: kartallaJson[i].lng}), // マーカーを立てる位置を指定
             map: map // マーカーを立てる地図を指定
         });
 
@@ -39,35 +38,32 @@ function setMarker(map,karttanaJson) {
          */
         marker[i].addListener('click', function () {
             $.getJSON(
-                "/getrestaurant/" + karttanaJson[i]['restaurantId'],
-                function (restaurantJson, status) {
-                    infoWindow.setContent(createContent(restaurantJson, karttanaJson[i]));
-                    map.panTo(marker[i]['position']);
-                    infoWindow.open(map, marker[i]); // 吹き出しの表示
+                "/getpaikka/" + kartallaJson[i]['paikkaId'],
+                function (paikkaJson, status) {
+                    document.getElementById('paikka-title').innerHTML = createHeader(paikkaJson);
+                    document.getElementById('paikka-body').innerHTML = paikkaJson.text ;
+                    setSter(kartallaJson[i]);
+                    $('.modal').modal('show');
                 });
         });
 
     }
 }
 
-function createContent(restaurantJson, karttanaJson) {
+function setSter(kartallaJson) {
+    let generalStar = kartallaJson['star'] * 100 / 5;
+
+    $(function() {
+        $(".star-rating-front").css({
+            "width": generalStar + "%"
+        });
+    });
+}
+
+function createHeader(paikkaJson) {
     return '' +
-        '<table class="table">' +
-        '<thead>' +
-        '   <tr><h4><a href="/restaurant/detail/' + restaurantJson.id + '">' +
-        restaurantJson.name + '</a></h4></tr>' +
-        '</thead>' +
-        '  <tbody>' +
-        '    <tr>' +
-        '      <td>詳細</td>' +
-        '      <td>' + restaurantJson.text + '</td>' +
-        '    </tr>' +
-        '    <tr>' +
-        '      <td>サナ</td>' +
-        '      <td>' + karttanaJson.sana + '</td>' +
-        '    </tr>' +
-        '  </tbody>' +
-        '</table>';
+        '<h5 class="text-muted"><a href="/paikka/' + paikkaJson.id + '">' +
+        paikkaJson.name + '</a></h5>'
 }
 
 function setCenter(map) {

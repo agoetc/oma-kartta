@@ -1,5 +1,29 @@
-@(error :Throwable*)
-@default("ログインページ", "ログインページ"){
-  <!--ログイン処理-->
-  @signinform()
+@(signinForm: Form[forms.UserForm.SigninForm])(implicit request: MessagesRequestHeader)
+@implicitField = @{ FieldConstructor(layout.fieldConstructor.f) }
+@import helper._
+@default("サインインページ", "サインイン"){
+  <!--サインイン処理-->
+    @if(request.flash.get("errorMessage")) {
+        <div class="alert alert-danger" role="alert">
+        @request.flash.get("errorMessage")
+        </div>
+    }
+
+    @form(routes.IndexController.checkSignin()) {
+
+        @inputText(signinForm("id"),
+            'class -> "form-control",
+            'placeholder -> "ユーザID",
+            'value -> signinForm.data.getOrElse("id", ""),
+        )
+
+        @inputPassword(signinForm("password"),
+            'class -> "form-control",
+            'placeholder -> "パスワード",
+            'value -> signinForm.data.getOrElse("password", ""),
+        )
+
+        <button type="submit" class="btn btn-primary">送信</button>
+    }
+
 }

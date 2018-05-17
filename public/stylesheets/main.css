@@ -1,9 +1,34 @@
 html{
-    margin-top: 30px;
+    margin-top: 70px;
 }
 
 #map {
     width: 100%;
     height: 600px;
     margin: 0 auto;
+}
+
+
+.star-rating {
+    position: relative;
+    width: 5em;
+    height: 1em;
+    top: -10px;
+    font-size: 18px;
+    margin-bottom: -17px;
+}
+.star-rating-front {
+    position: absolute;
+    top: 0;
+    left: 0;
+    overflow: hidden;
+    color: #ffcc33;
+}
+.star-rating-back {
+    color: #ccc;
+}
+
+.modal-title {
+    margin-left: 1px;
+    margin-top: 10px;
 }

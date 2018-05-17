@@ -25,7 +25,6 @@ function initialize(json) {
 
 function setMarker(map,kartallaJson) {
     let marker = [];
-    var infoWindow = new google.maps.InfoWindow({});
 
     for (let i in kartallaJson) {
         marker[i] = new google.maps.Marker({ // マーカーの追加
@@ -43,21 +42,28 @@ function setMarker(map,kartallaJson) {
                 function (paikkaJson, status) {
                     document.getElementById('paikka-title').innerHTML = createHeader(paikkaJson);
                     document.getElementById('paikka-body').innerHTML = paikkaJson.text ;
-
+                    setSter(kartallaJson[i]);
                     $('.modal').modal('show');
-                    // infoWindow.setContent(createContent(paikkaJson, kartallaJson[i]));
-                    // map.panTo(marker[i]['position']);
-                    // infoWindow.open(map, marker[i]); // 吹き出しの表示
                 });
         });
 
     }
 }
 
+function setSter(kartallaJson) {
+    let generalStar = kartallaJson['star'] * 100 / 5;
+
+    $(function() {
+        $(".star-rating-front").css({
+            "width": generalStar + "%"
+        });
+    });
+}
 
 function createHeader(paikkaJson) {
-    return '<h4 class="text-muted"><a href="/paikka/' + paikkaJson.id + '">' +
-        paikkaJson.name + '</a></h4>'
+    return '' +
+        '<h5 class="text-muted"><a href="/paikka/' + paikkaJson.id + '">' +
+        paikkaJson.name + '</a></h5>'
 }
 
 function setCenter(map) {

@@ -41,33 +41,23 @@ function setMarker(map,kartallaJson) {
             $.getJSON(
                 "/getpaikka/" + kartallaJson[i]['paikkaId'],
                 function (paikkaJson, status) {
-                    infoWindow.setContent(createContent(paikkaJson, kartallaJson[i]));
-                    map.panTo(marker[i]['position']);
-                    infoWindow.open(map, marker[i]); // 吹き出しの表示
+                    document.getElementById('paikka-title').innerHTML = createHeader(paikkaJson);
+                    document.getElementById('paikka-body').innerHTML = paikkaJson.text ;
+
+                    $('.modal').modal('show');
+                    // infoWindow.setContent(createContent(paikkaJson, kartallaJson[i]));
+                    // map.panTo(marker[i]['position']);
+                    // infoWindow.open(map, marker[i]); // 吹き出しの表示
                 });
         });
 
     }
 }
 
-function createContent(paikkaJson, kartallaJson) {
-    return '' +
-        '<table class="table">' +
-        '<thead>' +
-        '   <tr><h4><a href="/paikka/' + paikkaJson.id + '">' +
-        paikkaJson.name + '</a></h4></tr>' +
-        '</thead>' +
-        '  <tbody>' +
-        '    <tr>' +
-        '      <td>詳細</td>' +
-        '      <td>' + paikkaJson.text + '</td>' +
-        '    </tr>' +
-        '    <tr>' +
-        '      <td>サナ</td>' +
-        '      <td>' + kartallaJson.sana + '</td>' +
-        '    </tr>' +
-        '  </tbody>' +
-        '</table>';
+
+function createHeader(paikkaJson) {
+    return '<h4 class="text-muted"><a href="/paikka/' + paikkaJson.id + '">' +
+        paikkaJson.name + '</a></h4>'
 }
 
 function setCenter(map) {

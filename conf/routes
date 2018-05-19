@@ -20,6 +20,7 @@ POST    /paikka/:id/kartallaAdd             controllers.PaikkaController.addKart
 
 GET     /assets/*file                       controllers.Assets.versioned(path="/public", file: Asset)
 
-#GET     /follow/:id                         controllers.UserController.followlist(id: String)
+GET     /user/:id/follow                    controllers.UserController.followlist(id: String)
+GET     /user/:id/follower                  controllers.UserController.followerlist(id: String)
 GET     /userfollow/:id                     controllers.UserController.userfollow(id:String)
 

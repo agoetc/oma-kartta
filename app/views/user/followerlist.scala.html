@@ -1,0 +1,10 @@
+@(followers: Seq[(String,String)])
+@layout.default("フォローリスト","フォローリスト") {
+    <h1>フォローリスト</h1>
+    @for(follower <- followers) {
+        <tr>
+            <td>@follower._1</td>
+            <td>@follower._2</td></br>
+        </tr>
+    }
+}

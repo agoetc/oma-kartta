@@ -54,36 +54,33 @@ class UserController @Inject()(cc: ControllerComponents, authenticatedAction: Au
     )
   }
 
-  def userfollow(id:String) = Action { implicit request =>
+  def userfollow(id:String) = Action.async { implicit request =>
     val authId = request.session.get("user_id").getOrElse("")
     //すでにフォローしてたらフォローできへんようにするやつ↓
     UserDao.userauth(authId,id).map {auth=>
       auth match {
         case Nil =>
-          val query = Relation.map(relation => (relation.followId, relation.followerId)) += (authId,id)
-          db.run(query)
-        case _ => print("すでにフォローしてる")
+          UserDao.addFollow(authId,id)
+          Redirect(s"/user/${id}")
+        case _ => Redirect(s"/user/${id}")
       }
     }
-    Redirect(s"/user/${id}")
+
   }
 
 
-//  def followlist(id: String) = Action { implicit request =>
-//    //テーブルRelationにあるログインしている人(ID)の行を探す
-//    val followlistID = db.run(Relation.filter(relation => relation.followId === id).result)
-//    Await.ready(followlistID, 20 second)
-//    //ログインしている人がテーブルUsreに存在しているか探す
-//    val user = db.run(Users.filter(user => user.id === id).result)
-//    //ログイン
-//    val follow = db.run(Relation.filter(relation => relation.followId === authid).result)
-////    user.map(user =>
-////      authid match {
-////        case authid if authid == user.head.id => Ok(views.html.user.followlist(followlistID))
-////      }
-////    )
-//    Redirect("")
-//  }
+  def followlist(id: String) = Action.async {
+    val follows = UserDao.searchFollow(id)
+    follows.map { follow =>
+      Ok(views.html.user.followlist(follow))
+    }
+  }
 
+  def followerlist(id: String) = Action.async {
+    val followers = UserDao.searchFollower(id)
+    followers.map { follower =>
+      Ok(views.html.user.followlist(follower))
+    }
+  }
 
 }

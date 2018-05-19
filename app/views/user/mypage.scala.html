@@ -4,13 +4,13 @@
         <p>@user.name のマイページ</p>
         <thead class="thead-light">
             <tr>
-                <th>フォロー数</th>
+                <th><a href="/user/@user.id/follow">フォロー数</a></th>
                 <th>@followLen</th>
             </tr>
             <br>
         </thead>
         <tr>
-            <th><a href="/followlist/@user.id">フォロワー数</a></th>
+            <th><a href="/user/@user.id/follower">フォロワー数</a></th>
             <th>@followerLen</th>
         </tr>
     </dev>

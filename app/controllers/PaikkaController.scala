@@ -14,9 +14,12 @@ import forms.PaikkaForm._
 import models._
 
 @Singleton
-class PaikkaController @Inject()(cc: ControllerComponents, authenticatedAction: AuthenticatedAction) extends AbstractController(cc){
-
-
+class PaikkaController @Inject()(
+                                  cc: ControllerComponents,
+                                  messagesAction: MessagesActionBuilder,
+                                  authenticatedAction: AuthenticatedAction
+                                ) extends AbstractController(cc)
+{
   def paikkaDetail(id:Int) = authenticatedAction.async { implicit request =>
     val userId = request.session.get("user_id").getOrElse("")
     val paikka = PaikkaDao.getById(id)
@@ -44,21 +47,27 @@ class PaikkaController @Inject()(cc: ControllerComponents, authenticatedAction: 
       form => {   // geocoderでもらった、郵便番号と住所を取得する
         val postal_code = form.content.split(' ').apply(0).takeRight(8)
         val address = form.content.split(' ').apply(1)
-        Ok(views.html.paikka.paikkaaddform(postal_code, address))
+        Ok(views.html.paikka.paikkaaddform(createForm
+          .bind(Map(
+          "postal_code" -> postal_code,
+          "address" -> address))))
       }
     )
   }
 
 
-  def createPaikka = authenticatedAction.async { implicit request =>
-    newForm.bindFromRequest.fold(
+  def createPaikka = messagesAction.async { implicit request: MessagesRequest[AnyContent] =>
+    createForm.bindFromRequest.fold(
       errors =>{
-        Future(BadRequest(views.html.error.error("500", "内部エラー")))
+        Future(BadRequest(views.html.paikka.paikkaaddform(errors)))
       },
       form => {
-        // insertしたpaikkaのid取得
-        PaikkaDao.createPaikka(form).map { id =>
-          Redirect(s"/paikka/${id}")
+        request.session.get("user_id") match {
+          case Some(userId) =>
+            PaikkaDao.createPaikka(form, userId).map { id =>
+              Redirect(s"/paikka/${id}")
+            }
+          case None => Future(Redirect("/signin"))
         }
       }
     )
@@ -101,7 +110,7 @@ class PaikkaController @Inject()(cc: ControllerComponents, authenticatedAction: 
       paikkas match {
         case nonEmpty =>
           val paikka = paikkas.head
-          val sendPaikka = Paikka(paikka.id, paikka.name, paikka.kana, paikka.text, paikka.postalCode, paikka.address)
+          val sendPaikka = Paikka(paikka.id, paikka.name, paikka.kana, paikka.tag, paikka.text, paikka.postalCode, paikka.address)
           implicit val paikkaFormat = Json.format[Paikka]
           Ok(Json.toJson(sendPaikka))
         case _ =>  BadRequest(views.html.error.error("500", "内部エラーが発生しました"))

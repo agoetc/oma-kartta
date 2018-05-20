@@ -1,7 +1,10 @@
 @(elements: helper.FieldElements)
 <div class="form-group">
+    @if(elements.args.contains('label)) {　
+    <label for="@elements.id" class="col-sm-2 col-form-label">@elements.args.get('label)</label>
+    }
     @if(elements.hasErrors) {
-        <span class="text-danger errors">@elements.errors.last</span>
+    <span class="text-danger errors">@elements.errors.last</span>
     }
     @elements.input
 </div>

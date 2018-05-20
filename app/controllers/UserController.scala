@@ -2,14 +2,10 @@ package controllers
 
 import javax.inject._
 import play.api.mvc._
-import play.api.data._
-import play.api.data.Forms._
-import models.UserDao
+import models.{UserDao, RelationDao}
 import utils.AuthenticatedAction
 import scala.concurrent._
 import scala.language.postfixOps
-import models.Tables._
-import slick.jdbc.MySQLProfile.api._
 import ExecutionContext.Implicits.global
 
 
@@ -54,32 +50,29 @@ class UserController @Inject()(cc: ControllerComponents, authenticatedAction: Au
     )
   }
 
-  def userfollow(id:String) = Action.async { implicit request =>
+  def followUser(id: String) = Action.async { implicit request =>
     val authId = request.session.get("user_id").getOrElse("")
-    //すでにフォローしてたらフォローできへんようにするやつ↓
-    UserDao.userauth(authId,id).map {auth=>
+    RelationDao.isFollow(authId,id).map {auth =>
       auth match {
         case Nil =>
-          UserDao.addFollow(authId,id)
+          RelationDao.addFollow(authId,id)
           Redirect(s"/user/${id}")
         case _ => Redirect(s"/user/${id}")
       }
     }
-
   }
 
-
   def followlist(id: String) = Action.async {
-    val follows = UserDao.searchFollow(id)
+    val follows = RelationDao.getFollowDetails(id)
     follows.map { follow =>
       Ok(views.html.user.followlist(follow))
     }
   }
 
   def followerlist(id: String) = Action.async {
-    val followers = UserDao.searchFollower(id)
+    val followers = RelationDao.getFollowerDetails(id)
     followers.map { follower =>
-      Ok(views.html.user.followlist(follower))
+      Ok(views.html.user.followerlist(follower))
     }
   }
 

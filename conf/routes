@@ -22,5 +22,5 @@ GET     /assets/*file                       controllers.Assets.versioned(path="/
 
 GET     /user/:id/follow                    controllers.UserController.followlist(id: String)
 GET     /user/:id/follower                  controllers.UserController.followerlist(id: String)
-GET     /userfollow/:id                     controllers.UserController.userfollow(id:String)
+GET     /follow/:id                     controllers.UserController.followUser(id:String)
 

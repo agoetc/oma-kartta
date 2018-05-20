@@ -1,10 +1,10 @@
-@(follows: Seq[(String,String)])
+@(follows: Seq[Tables.UsersRow])
 @layout.default("フォローリスト","フォローリスト") {
-    <h1>フォローリスト</h1>
+    <h4>フォローリスト</h4>
     @for(follow <- follows) {
         <tr>
-            <td>@follow._1</td>
-            <td>@follow._2</td></br>
+            <td>@follow.id</td>
+            <td>@follow.name</td></br>
         </tr>
     }
 }

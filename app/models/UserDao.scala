@@ -6,7 +6,6 @@ import scala.concurrent._
 import scala.concurrent.ExecutionContext.Implicits.global
 
 
-
 object UserDao {
 
   val db = Database.forConfig("mysqldb")
@@ -42,30 +41,4 @@ object UserDao {
       (user.id like "%" + userId + "%")).result
     db.run(query)
   }
-
-
-  def userauth(authId: String, id: String) = {
-    val query = Relation.filter(r=> r.followId===authId && r.followerId===id).result
-    db.run(query)
-  }
-
-  def addFollow(authId:String,id:String)={
-    val query = Relation.map(relation => (relation.followId, relation.followerId)) += (authId,id)
-    db.run(query)
-  }
-
-  def searchFollow(id:String)={
-    val query = Relation.flatMap(r=>
-              Users.filter(u=> r.followerId===u.id&&r.followId===id)
-                  .map(u=>(r.followerId,u.name))).result
-    db.run(query)
-  }
-
-  def searchFollower(id:String)={
-    val query = Relation.flatMap(r=>
-      Users.filter(u=> r.followId===u.id&&r.followerId===id)
-        .map(u=>(r.followId,u.name))).result
-    db.run(query)
-  }
-
 }

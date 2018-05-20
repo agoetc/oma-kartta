@@ -1,53 +1,58 @@
-@(postal_code: String, address: String)
-@layout.default("パイッカ：新規登録", "パイッカ登録フォーム"){
-    <form action="/paikka/register" method="post">
-        <div class="form-group row">
-            <label for="name" class="col-sm-2 col-form-label">パイッカ名</label>
-            <div class="col-sm-10">
-                <input type="text" class="form-control" name="name" placeholder="パイッカ名">
-            </div>
-        </div>
+@(createPaikkaForm: Form[forms.PaikkaForm.CreatePaikkaForm])(implicit request: MessagesRequestHeader)
+@import helper._
+@implicitField = @{ FieldConstructor(layout.fieldConstructor.f) }
 
-        <div class="form-group row">
-            <label for="kana" class="col-sm-2 col-form-label">かな</label>
-            <div class="col-sm-10">
-                <input type="text" class="form-control" name="kana" placeholder="ひらがな">
-            </div>
-        </div>
+    @layout.default("パイッカ：新規登録", "パイッカ登録フォーム"){
 
-        <div class="form-group row">
-            <label for="name" class="col-sm-2 col-form-label">タグ</label>
-            <div class="col-sm-10">
-                <input type="text" class="form-control" name="tag" placeholder="例: [レストラン, 公園]">
-            </div>
-        </div>
+    @form(routes.PaikkaController.createPaikka()) {
 
-        <div class="form-group row">
-            <label for="text" class="col-sm-2 col-form-label">詳細</label>
-            <div class="col-sm-10">
-                <input type="text" class="form-control" name="text" placeholder="パイッカの説明">
-            </div>
-        </div>
+        @inputText(createPaikkaForm("name"),
+            'label -> "パイッカ名",
+            'class -> "form-control",
+            'placeholder -> "パイッカ名",
+            'value -> createPaikkaForm.data.getOrElse("name", ""),
+        )
 
-        <div class="form-group row">
-            <label for="postal_code" class="col-sm-2 col-form-label">郵便番号</label>
-            <div class="col-sm-10">
-                <input type="text" class="form-control" name="postal_code" value="@postal_code" placeholder="@postal_code" readonly>
-            </div>
-        </div>
+        @inputText(createPaikkaForm("kana"),
+            'label -> "ふりがな",
+            'class -> "form-control",
+            'placeholder -> "ふりがな",
+            'value -> createPaikkaForm.data.getOrElse("kana", ""),
+        )
 
-        <div class="form-group row">
-            <label for="adress" class="col-sm-2 col-form-label">住所</label>
-            <div class="col-sm-10">
-                <input type="text" class="form-control" name="address" value="@address" placeholder="@address" readonly>
-            </div>
-        </div>
+        @inputText(createPaikkaForm("tag"),
+            'label -> "タグ",
+            'class -> "form-control",
+            'placeholder -> "例: [レストラン, 公園]",
+            'value -> createPaikkaForm.data.getOrElse("tag", ""),
+        )
+
+        @inputText(createPaikkaForm("text"),
+            'label -> "詳細",
+            'class -> "form-control",
+            'placeholder -> "パイッカの詳細",
+            'value -> createPaikkaForm.data.getOrElse("text", ""),
+        )
+
+        @inputText(createPaikkaForm("postal_code"),
+            'label -> "郵便番号",
+            'class -> "form-control",
+            'placeholder -> createPaikkaForm.data.getOrElse("postal_code", ""),
+            'value -> createPaikkaForm.data.getOrElse("postal_code", ""),
+            'readonly -> "",
+        )
+
+        @inputText(createPaikkaForm("address"),
+            'label -> "住所",
+            'class -> "form-control",
+            'placeholder -> createPaikkaForm.data.getOrElse("address", ""),
+            'value -> createPaikkaForm.data.getOrElse("address", ""),
+            'readonly -> "",
+        )
+        <button type="submit" class="btn btn-primary">送信</button>
+
+    }
 
 
-        <div class="form-group row">
-            <div class="col-sm-10 offset-sm-2">
-                <button type="submit" class="btn btn-primary">登録</button>
-            </div>
-        </div>
-    </form>
+
 }

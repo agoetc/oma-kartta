@@ -58,26 +58,29 @@ trait Tables {
 
   /** Entity class storing rows of table Paikka
    *  @param id Database column id SqlType(INT), AutoInc, PrimaryKey
+   *  @param userId Database column user_id SqlType(VARCHAR), Length(20,true)
    *  @param name Database column name SqlType(VARCHAR), Length(255,true)
    *  @param kana Database column kana SqlType(VARCHAR), Length(255,true)
    *  @param tag Database column tag SqlType(VARCHAR), Length(20,true)
    *  @param text Database column text SqlType(VARCHAR), Length(255,true), Default(None)
    *  @param postalCode Database column postal_code SqlType(VARCHAR), Length(8,true)
    *  @param address Database column address SqlType(VARCHAR), Length(255,true) */
-  case class PaikkaRow(id: Int, name: String, kana: String, tag: String, text: Option[String] = None, postalCode: String, address: String)
+  case class PaikkaRow(id: Int, userId: String, name: String, kana: String, tag: String, text: Option[String] = None, postalCode: String, address: String)
   /** GetResult implicit for fetching PaikkaRow objects using plain SQL queries */
   implicit def GetResultPaikkaRow(implicit e0: GR[Int], e1: GR[String], e2: GR[Option[String]]): GR[PaikkaRow] = GR{
     prs => import prs._
-    PaikkaRow.tupled((<<[Int], <<[String], <<[String], <<[String], <<?[String], <<[String], <<[String]))
+    PaikkaRow.tupled((<<[Int], <<[String], <<[String], <<[String], <<[String], <<?[String], <<[String], <<[String]))
   }
   /** Table description of table paikka. Objects of this class serve as prototypes for rows in queries. */
   class Paikka(_tableTag: Tag) extends profile.api.Table[PaikkaRow](_tableTag, Some("omakartta"), "paikka") {
-    def * = (id, name, kana, tag, text, postalCode, address) <> (PaikkaRow.tupled, PaikkaRow.unapply)
+    def * = (id, userId, name, kana, tag, text, postalCode, address) <> (PaikkaRow.tupled, PaikkaRow.unapply)
     /** Maps whole row to an option. Useful for outer joins. */
-    def ? = (Rep.Some(id), Rep.Some(name), Rep.Some(kana), Rep.Some(tag), text, Rep.Some(postalCode), Rep.Some(address)).shaped.<>({r=>import r._; _1.map(_=> PaikkaRow.tupled((_1.get, _2.get, _3.get, _4.get, _5, _6.get, _7.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
+    def ? = (Rep.Some(id), Rep.Some(userId), Rep.Some(name), Rep.Some(kana), Rep.Some(tag), text, Rep.Some(postalCode), Rep.Some(address)).shaped.<>({r=>import r._; _1.map(_=> PaikkaRow.tupled((_1.get, _2.get, _3.get, _4.get, _5.get, _6, _7.get, _8.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
 
     /** Database column id SqlType(INT), AutoInc, PrimaryKey */
     val id: Rep[Int] = column[Int]("id", O.AutoInc, O.PrimaryKey)
+    /** Database column user_id SqlType(VARCHAR), Length(20,true) */
+    val userId: Rep[String] = column[String]("user_id", O.Length(20,varying=true))
     /** Database column name SqlType(VARCHAR), Length(255,true) */
     val name: Rep[String] = column[String]("name", O.Length(255,varying=true))
     /** Database column kana SqlType(VARCHAR), Length(255,true) */
@@ -90,6 +93,9 @@ trait Tables {
     val postalCode: Rep[String] = column[String]("postal_code", O.Length(8,varying=true))
     /** Database column address SqlType(VARCHAR), Length(255,true) */
     val address: Rep[String] = column[String]("address", O.Length(255,varying=true))
+
+    /** Foreign key referencing Users (database name paikka_ibfk_1) */
+    lazy val usersFk = foreignKey("paikka_ibfk_1", userId, Users)(r => r.id, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
   }
   /** Collection-like TableQuery object for table Paikka */
   lazy val Paikka = new TableQuery(tag => new Paikka(tag))

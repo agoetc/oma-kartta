@@ -2,7 +2,7 @@ package models
 
 import slick.jdbc.MySQLProfile.api._
 import models.Tables._
-import forms.PaikkaForm.createPaikkaForm
+import forms.PaikkaForm.CreatePaikkaForm
 import scala.concurrent._
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -17,9 +17,9 @@ object PaikkaDao {
   }
 
 
-  def createPaikka(form: createPaikkaForm) = {
+  def createPaikka(form: CreatePaikkaForm, userId: String) = {
     val query = Paikka returning Paikka.map(_.id) +=
-      PaikkaRow(0,form.name, form.kana, form.tag, form.text, form.postalCode, form.address)
+      PaikkaRow(0, userId, form.name, form.kana, form.tag, form.text, form.postalCode, form.address)
     db.run(query)
   }
 

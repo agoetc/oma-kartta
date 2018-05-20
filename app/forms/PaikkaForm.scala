@@ -11,7 +11,7 @@ object PaikkaForm {
   case class MapContent(content: String)
   case class FollowKartalla(userId: String, star: Int, sana: String, paikkaId: Int, createdAt: Date, lat: Double, lng: Double)
   case class Paikka(id: Int, name: String, kana: String,tag: String, text: Option[String] = None, postalCode: String, address: String)
-  case class createPaikkaForm(name: String, kana: String,tag: String, text: Option[String] = None, postalCode: String, address: String)
+  case class CreatePaikkaForm(name: String, kana: String,tag: String, text: Option[String] = None, postalCode: String, address: String)
 
   val mapContent = Form(
     mapping(
@@ -19,7 +19,7 @@ object PaikkaForm {
     )(MapContent.apply)(MapContent.unapply)
   )
 
-  val newForm = Form(
+  val createForm = Form(
     mapping(
       "name" -> nonEmptyText,
       "kana" -> nonEmptyText,
@@ -27,7 +27,7 @@ object PaikkaForm {
       "text" -> optional(text),
       "postal_code" -> nonEmptyText,
       "address" -> nonEmptyText
-    )(createPaikkaForm.apply)(createPaikkaForm.unapply)
+    )(CreatePaikkaForm.apply)(CreatePaikkaForm.unapply)
   )
 
 

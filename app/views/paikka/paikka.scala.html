@@ -1,4 +1,6 @@
 @(paikka: models.Tables.Paikka#TableElementType)(implicit request: RequestHeader)
+@import play.twirl.api.HtmlFormat
+
 @layout.default("店舗", paikka.name){
 
     @if(request.flash.get("message")) {
@@ -15,7 +17,6 @@
 
     @kartallaform(paikka.id)
     <dev>
-
-        <p>@paikka.text</p>
+        <p>@Html(HtmlFormat.escape(paikka.text.getOrElse("")).toString().replace("\n", "<br />"))</p>
     </dev>
 }

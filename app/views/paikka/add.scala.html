@@ -1,7 +1,7 @@
-@()
+@()(implicit req: RequestHeader)
 @layout.default("パイッカ: 登録", "パイッカ登録"){
     <script src="@routes.Assets.versioned("javascripts/location.js")" type="text/javascript"></script>
     <div id="map"></div>
+    @addmodal()
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCAOzLlAZWOmIYS_fDNMEWex6WGUk1sKdw&callback=initMap"></script>
-
 }

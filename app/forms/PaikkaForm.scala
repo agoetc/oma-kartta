@@ -25,7 +25,7 @@ object PaikkaForm {
       "kana" -> nonEmptyText(maxLength = 30),
       "tag" -> nonEmptyText(maxLength = 20),
       "text" -> optional(text(maxLength = 255)),
-      "postal_code" -> nonEmptyText,
+      "postalCode" -> nonEmptyText,
       "address" -> nonEmptyText
     )(CreatePaikkaForm.apply)(CreatePaikkaForm.unapply)
   )

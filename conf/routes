@@ -13,8 +13,7 @@ GET	    /user/:id		                    controllers.UserController.userDetail(id:
 GET     /mypage                             controllers.UserController.mypage
 GET     /user                               controllers.UserController.index(username: Option[String],userID: Option[String])
 GET     /paikka/add                         controllers.PaikkaController.addMap
-POST    /paikka/new                         controllers.PaikkaController.contentPost
-POST    /paikka/register                    controllers.PaikkaController.createPaikka
+POST    /paikka/create                        controllers.PaikkaController.createPaikka
 GET     /paikka/:id                         controllers.PaikkaController.paikkaDetail(id:Int)
 POST    /paikka/:id/kartallaAdd             controllers.PaikkaController.addKartalla(id: Int)
 

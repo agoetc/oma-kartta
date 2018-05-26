@@ -1,4 +1,51 @@
 
+function handleLocationError(browserHasGeolocation, infoWindow, pos) {
+    infoWindow.setPosition(pos);
+    infoWindow.setContent(browserHasGeolocation ?
+        'Error: The Geolocation service failed.' :
+        'Error: Your browser doesn\'t support geolocation.');
+}
+
+function check(results) {
+    $('span').remove();
+    for (let key in results) {
+        let element = document.getElementById(key);
+        let span = document.createElement('span');
+        span.innerHTML = results[key];
+        span.className = "text-danger";
+        // inputの上にエラーの生成
+        element.parentNode.insertBefore(span, element);
+    }
+}
+
+
+function sendForm() {
+
+    var data = JSON.stringify(parseJson($('#paikka-form').serializeArray()));
+
+    $.post({
+        url: "/paikka/create",
+        data: data,
+        contentType: 'application/json',
+    }).then(
+        results => {
+            if(results["ok"]) location.href= '/paikka/' + results["ok"];
+            check(results);
+        },
+        error => alert("なにか問題が発生しました")
+    );
+
+}
+
+function parseJson(data) {
+    var returnJson = {};
+    for (idx = 0; idx < data.length; idx++) {
+        returnJson[data[idx].name] = data[idx].value
+    }
+    return returnJson;
+}
+
+
 function initMap(){
     var map = new google.maps.Map(document.getElementById('map'), {
         center: "", // 地図の中心を指定
@@ -9,7 +56,6 @@ function initMap(){
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function(position) {
 
-            var pushpos;
             var geocoder = new google.maps.Geocoder();
 
             map.setCenter({
@@ -33,14 +79,20 @@ function initMap(){
             });
 
             marker.addListener('click', function() { // マーカーをクリックしたとき
-                pushpos = marker.position;
-                geocoder.geocode( {latLng: pushpos}, function(results, status){
-                results = results[0].formatted_address;
-                var dom = '<form action="/paikka/new" method="post">' +
-                    '<button type="submit" name="content" value="'+results+'">ここを登録する</button>' +
-                    '</form>';
-                infoWindow.setOptions({content: dom});
-                infoWindow.open(map, marker); // 吹き出しの表示
+
+                geocoder.geocode( {latLng: marker.position}, function(results, status){
+                    results = results[0].formatted_address.split(' ');
+                    if (results[0].match(/\d/g) == null) {
+                        alert('この場所は登録出来ません');
+                        return;
+                    }
+
+                    // resultからう郵便番号、住所を取得。その後モーダルに出力
+                    let postalCode = results[0].match(/\d/g).toString().replace(/,/g,'');
+                    let address = results[1];
+                    document.getElementById("postalCode").value = postalCode;
+                    document.getElementById("address").value = address;
+                    $('.modal').modal('show');
                 });
             });
 
@@ -54,9 +106,3 @@ function initMap(){
 }
 
 
-function handleLocationError(browserHasGeolocation, infoWindow, pos) {
-    infoWindow.setPosition(pos);
-    infoWindow.setContent(browserHasGeolocation ?
-        'Error: The Geolocation service failed.' :
-        'Error: Your browser doesn\'t support geolocation.');
-}

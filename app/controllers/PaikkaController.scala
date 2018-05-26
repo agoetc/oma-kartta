@@ -2,8 +2,8 @@ package controllers
 
 import javax.inject._
 import play.api.mvc._
-import play.api.libs.json._
 import play.api.libs.json.Writes._
+import play.api.libs.json._
 import scala.concurrent._
 import ExecutionContext.Implicits.global
 import scala.language.postfixOps
@@ -36,44 +36,32 @@ class PaikkaController @Inject()(
     }
   }
 
-  def addMap() = authenticatedAction {
-    Ok(views.html.paikka.paikkaadd())
+  def addMap() = authenticatedAction { implicit request =>
+    Ok(views.html.paikka.add())
   }
-
-
-  def contentPost = authenticatedAction { implicit request =>
-    mapContent.bindFromRequest.fold(
-      errors => Ok(views.html.error.error("500", "内部エラーが発生しました")),
-      form => {   // geocoderでもらった、郵便番号と住所を取得する
-        val postal_code = form.content.split(' ').apply(0).takeRight(8)
-        val address = form.content.split(' ').apply(1)
-        Ok(views.html.paikka.paikkaaddform(createForm
-          .bind(Map(
-          "postal_code" -> postal_code,
-          "address" -> address))))
-      }
-    )
-  }
-
 
   def createPaikka = messagesAction.async { implicit request: MessagesRequest[AnyContent] =>
-    createForm.bindFromRequest.fold(
-      errors =>{
-        Future(BadRequest(views.html.paikka.paikkaaddform(errors)))
-      },
-      form => {
-        request.session.get("user_id") match {
-          case Some(userId) =>
-            PaikkaDao.createPaikka(form, userId).map { id =>
-              Redirect(s"/paikka/${id}")
-            }
-          case None => Future(Redirect("/signin"))
-        }
+    val result =
+      for {
+        userId <- request.session.get("user_id")
+        json <- request.body.asJson
+      } yield {
+        createForm.bind(json).fold(
+          errors =>
+            Future(Ok(errors.errorsAsJson)),
+         form =>
+           PaikkaDao.createPaikka(form, userId).map(id =>
+             Ok(Json.toJson(Map("ok" -> id)))
+           )
+        )
       }
-    )
+    result match {
+      case Some(result) => result
+      case None => Future(BadRequest)
+    }
   }
 
-  def addKartalla(id: Int) = authenticatedAction { implicit request =>
+      def addKartalla(id: Int) = authenticatedAction { implicit request =>
     createKartallaForm.bindFromRequest.fold(
       errors =>
         Redirect(s"/paikka/${id}").flashing("errorMessage" -> "エラーが発生しました"),

@@ -2,9 +2,7 @@ package controllers
 
 import javax.inject._
 import play.api.mvc._
-import play.api.data._
-import play.api.data.Forms._
-import models.UserDao
+import models.{UserDao, RelationDao}
 import utils.AuthenticatedAction
 import scala.concurrent._
 import scala.language.postfixOps
@@ -12,6 +10,7 @@ import ExecutionContext.Implicits.global
 
 
 class UserController @Inject()(cc: ControllerComponents, authenticatedAction: AuthenticatedAction) extends AbstractController(cc){
+
 
   def userDetail(id: String) = authenticatedAction.async { implicit request =>
     val user = UserDao.getById(id)
@@ -50,4 +49,31 @@ class UserController @Inject()(cc: ControllerComponents, authenticatedAction: Au
       Ok(views.html.paikka.userlist(user))
     )
   }
+
+  def followUser(id: String) = Action.async { implicit request =>
+    val authId = request.session.get("user_id").getOrElse("")
+    RelationDao.isFollow(authId,id).map {auth =>
+      auth match {
+        case Nil =>
+          RelationDao.addFollow(authId,id)
+          Redirect(s"/user/${id}")
+        case _ => Redirect(s"/user/${id}")
+      }
+    }
+  }
+
+  def followlist(id: String) = Action.async {
+    val follows = RelationDao.getFollowDetails(id)
+    follows.map { follow =>
+      Ok(views.html.user.followlist(follow))
+    }
+  }
+
+  def followerlist(id: String) = Action.async {
+    val followers = RelationDao.getFollowerDetails(id)
+    followers.map { follower =>
+      Ok(views.html.user.followerlist(follower))
+    }
+  }
+
 }

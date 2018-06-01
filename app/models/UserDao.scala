@@ -6,7 +6,6 @@ import scala.concurrent._
 import scala.concurrent.ExecutionContext.Implicits.global
 
 
-
 object UserDao {
 
   val db = Database.forConfig("mysqldb")
@@ -42,5 +41,4 @@ object UserDao {
       (user.id like "%" + userId + "%")).result
     db.run(query)
   }
-
 }

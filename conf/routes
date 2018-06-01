@@ -18,3 +18,8 @@ GET     /paikka/:id                         controllers.PaikkaController.paikkaD
 POST    /paikka/:id/kartallaAdd             controllers.PaikkaController.addKartalla(id: Int)
 
 GET     /assets/*file                       controllers.Assets.versioned(path="/public", file: Asset)
+
+GET     /user/:id/follow                    controllers.UserController.followlist(id: String)
+GET     /user/:id/follower                  controllers.UserController.followerlist(id: String)
+GET     /follow/:id                     controllers.UserController.followUser(id:String)
+

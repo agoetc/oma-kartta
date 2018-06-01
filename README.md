@@ -14,5 +14,5 @@ apikey直書きしてたんで
 
 
 ### 上げ方
-docker-compose up
+docker-compose up  
 sbt run
